@@ -1,9 +1,17 @@
+from __future__ import print_function
 import logging
 import telegram
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, filters, ConversationHandler, ApplicationBuilder)
 import os
 import mysql.connector
+from mysql.connector import errorcode
+
+
+# cnx = mysql.connector.connect(user='root', password='1234',
+#                               host='127.0.0.1',
+#                               database='telegram-bot')
+# cnx.close()
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
@@ -26,6 +34,9 @@ async def start(update, context):
     await update.message.reply_text(
         "سلام من ربات مدیریت کلاس برنامه سازی پیشرفته هستم.اگه میخوای توی این کلاس شرکت کنی شماره دانشجوییت رو برام "
         "بنویس")
+    user = update.message.from_user
+    user_data = context.user_data
+    # print(user[1])
     return STUDENT_NUMBER
 
 
@@ -53,7 +64,8 @@ async def fname(update, context):
 
     logger.info("first name of %s: %s", user.first_name, update.message.text)
 
-    await update.message.reply_text("حالا نام خانوادگیت رو بنویس.")
+    await update.message.reply_text("چ اسم قشنگی☺️")
+    await update.message.reply_text("حالا فامیلیت رو هم برام بنویس.")
 
     return LNAME
 
@@ -123,6 +135,7 @@ def error(update, context):
 
 
 def main():
+
     app = ApplicationBuilder().token("5806507050:AAFVm2zmYpAxDwjQtXr_MaROnYM_eZG8gwI").build()
 
 
@@ -149,6 +162,61 @@ def main():
     app.run_polling()
 
 
-if __name__ == '__main__':
+DB_NAME = 'telegram_bot'
+TABLES = {}
+TABLES['students'] = (
+    "CREATE TABLE `student` ("
+    "  `id` int(11) NOT NULL,"
+    "  `student_number` int(8) NOT NULL,"
+    "  `first_name` varchar(14) NOT NULL,"
+    "  `last_name` varchar(16) NOT NULL,"
+    "  `sex` enum('M','F') NOT NULL,"
+    "  PRIMARY KEY (`student_number`)"
+    ") ENGINE=InnoDB")
 
+cnx = mysql.connector.connect(user='root', password='1234', host='127.0.0.1')
+cursor = cnx.cursor()
+
+
+def create_database(cursor):
+    try:
+        cursor.execute(
+            "CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(DB_NAME))
+    except mysql.connector.Error as err:
+        print("Failed creating database: {}".format(err))
+
+    try:
+        cursor.execute("USE {}".format(DB_NAME))
+    except mysql.connector.Error as err:
+        print("Database {} does not exists.".format(DB_NAME))
+        if err.errno == errorcode.ER_BAD_DB_ERROR:
+            create_database(cursor)
+            print("Database {} created successfully.".format(DB_NAME))
+            cnx.database = DB_NAME
+        else:
+            print(err)
+            exit(1)
+
+    for table_name in TABLES:
+        table_description = TABLES[table_name]
+        try:
+            print("Creating table {}: ".format(table_name), end='')
+            cursor.execute(table_description)
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+                print("already exists.")
+            else:
+                print(err.msg)
+        else:
+            print("OK")
+
+    cursor.close()
+    cnx.close()
+
+if __name__ == '__main__':
+    create_database(cursor)
     main()
+
+
+
+
