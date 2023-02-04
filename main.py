@@ -7,7 +7,6 @@ import os
 import mysql.connector
 from mysql.connector import errorcode
 
-
 # cnx = mysql.connector.connect(user='root', password='1234',
 #                               host='127.0.0.1',
 #                               database='telegram-bot')
@@ -116,6 +115,9 @@ async def confirmation(update, context):
     user = update.message.from_user
     user_data = context.user_data
     logger.info("User %s added to the class", user.first_name)
+
+    add_student(user.id, user_data)
+
     await update.message.reply_text("نام شما در کلاس ثبت شد!")
 
     return ConversationHandler.END
@@ -134,10 +136,34 @@ def error(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
+def add_student(user_id, user_data):
+    items = []
+    for key, value in user_data.items():
+        items.append(value)
+    print(items)
+    if items[3] == 'مرد':
+        sex = 'M'
+    elif items[3] == 'زن':
+        sex = 'F'
+
+    # add user to the database
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+
+    add_student = ("INSERT INTO students "
+                   "(id, student_number, first_name, last_name, sex)"
+                   "VALUES (%s, %s, %s, %s, %s)")
+
+    data_student = (user_id, items[0], items[1], items[2], sex)
+    print(data_student)
+    cursor.execute(add_student, data_student)
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
 def main():
-
     app = ApplicationBuilder().token("5806507050:AAFVm2zmYpAxDwjQtXr_MaROnYM_eZG8gwI").build()
-
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
@@ -162,22 +188,6 @@ def main():
     app.run_polling()
 
 
-DB_NAME = 'telegram_bot'
-TABLES = {}
-TABLES['students'] = (
-    "CREATE TABLE `student` ("
-    "  `id` int(11) NOT NULL,"
-    "  `student_number` int(8) NOT NULL,"
-    "  `first_name` varchar(14) NOT NULL,"
-    "  `last_name` varchar(16) NOT NULL,"
-    "  `sex` enum('M','F') NOT NULL,"
-    "  PRIMARY KEY (`student_number`)"
-    ") ENGINE=InnoDB")
-
-cnx = mysql.connector.connect(user='root', password='1234', host='127.0.0.1')
-cursor = cnx.cursor()
-
-
 def create_database(cursor):
     try:
         cursor.execute(
@@ -195,7 +205,6 @@ def create_database(cursor):
             cnx.database = DB_NAME
         else:
             print(err)
-            exit(1)
 
     for table_name in TABLES:
         table_description = TABLES[table_name]
@@ -213,10 +222,22 @@ def create_database(cursor):
     cursor.close()
     cnx.close()
 
+
+DB_NAME = 'telegram_bot'
+TABLES = {}
+TABLES['students'] = (
+    "CREATE TABLE `students` ("
+    "  `id` int(11) NOT NULL,"
+    "  `student_number` int(8) NOT NULL,"
+    "  `first_name` varchar(14) NOT NULL,"
+    "  `last_name` varchar(16) NOT NULL,"
+    "  `sex` enum('M','F') NOT NULL,"
+    "  PRIMARY KEY (`student_number`)"
+    ") ENGINE=InnoDB")
+
+cnx = mysql.connector.connect(user='root', password='1234', host='127.0.0.1')
+cursor = cnx.cursor()
+
 if __name__ == '__main__':
     create_database(cursor)
     main()
-
-
-
-
