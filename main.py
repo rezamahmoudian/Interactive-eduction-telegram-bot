@@ -16,7 +16,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-STUDENT_NUMBER, FNAME, LNAME, SEX, CONFIRMATION = range(5)
+STUDENT_NUMBER, FNAME, LNAME, SEX, PASSWORD, CONFIRMATION = range(6)
 
 TOKEN = "5806507050:AAFVm2zmYpAxDwjQtXr_MaROnYM_eZG8gwI"
 bot = telegram.Bot(token=TOKEN)
@@ -35,8 +35,22 @@ async def start(update, context):
         "بنویس")
     user = update.message.from_user
     user_data = context.user_data
-    # print(user[1])
     return STUDENT_NUMBER
+
+
+def check_student_number(student_number):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+
+    check = False
+    query = "SELECT student_number FROM students"
+    cursor.execute(query)
+    for data in cursor:
+        for student_num in data:
+            print(student_num)
+            if student_num == student_number:
+                check = True
+    return check
 
 
 async def student_number(update, context):
@@ -48,10 +62,18 @@ async def student_number(update, context):
 
     logger.info("student number of %s: %s", user.first_name, update.message.text)
 
-    await update.message.reply_text("خب؛ شماره دانشجوییت ثبت شد.")
-    await update.message.reply_text("حالا اسمت رو برام بنویس.")
+    if check_student_number(int(text)):
 
-    return FNAME
+        await update.message.reply_text("خب؛ شماره دانشجوییت ثبت شد.")
+        await update.message.reply_text("متاسفانه هنوز مشخصاتت رو تکمیل نکردی لطفا مشخصاتت رو بگو ک ثبت کنم.")
+        await update.message.reply_text("قبل از هرچیزی اسمت رو برام بنویس.")
+        return FNAME
+    else:
+        await update.message.reply_text("شماره دانشجویی شما در کلاس ثبت نیست.")
+        await update.message.reply_text("اگر از دانشجویان کلاس هستید این موصوع را با ta در میان بگذارید.")
+        return ConversationHandler.END
+
+
 
 
 async def fname(update, context):
@@ -102,6 +124,21 @@ async def sex(update, context):
 
     logger.info("sex of %s: %s", user.first_name, update.message.text)
 
+    await update.message.reply_text("بسیار عالی؛ حالا ی پسوورد برای اکانتت انتخاب کن.")
+
+    return PASSWORD
+
+
+async def password(update, context):
+    user = update.message.from_user
+    user_data = context.user_data
+    category = 'رمز ورود'
+
+    text = update.message.text
+    user_data[category] = text
+
+    logger.info("password of %s: %s", user.first_name, update.message.text)
+
     await update.message.reply_text(
         'از این که اطلاعات را برای ما ارسال کردین سپاس گزاریم . لطفا بررسی کنید که آیا اطلاعات مورد تاییدتان است یا '
         'نه {}'.format(
@@ -150,17 +187,22 @@ def add_student(user_id, user_data):
     cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
     cursor = cnx.cursor()
 
-    add_student = ("INSERT INTO students "
-                   "(id, student_number, first_name, last_name, sex)"
-                   "VALUES (%s, %s, %s, %s, %s)")
+    update_student = ("UPDATE students"
+                      " SET id = %s, first_name = %s, last_name = %s, sex = %s"
+                      "WHERE student_number = %s")
+    print(update_student)
+    # add_student = ("INSERT INTO students "
+    #                "(id, student_number, first_name, last_name, sex)"
+    #                "VALUES (%s, %s, %s, %s, %s)")
 
-    data_student = (user_id, items[0], items[1], items[2], sex)
+    data_student = (user_id, items[1], items[2], sex, items[0])
     print(data_student)
-    cursor.execute(add_student, data_student)
+    cursor.execute(update_student, data_student)
     cnx.commit()
 
     cursor.close()
     cnx.close()
+
 
 def main():
     app = ApplicationBuilder().token("5806507050:AAFVm2zmYpAxDwjQtXr_MaROnYM_eZG8gwI").build()
@@ -173,6 +215,7 @@ def main():
             FNAME: [CommandHandler('start', start), MessageHandler(filters.TEXT, fname)],
             LNAME: [CommandHandler('start', start), MessageHandler(filters.TEXT, lname)],
             SEX: [CommandHandler('start', start), MessageHandler(filters.TEXT, sex)],
+            PASSWORD: [CommandHandler('start', start), MessageHandler(filters.TEXT, password)],
             CONFIRMATION: [CommandHandler('start', start),
                            MessageHandler(filters.Regex('^مورد تایید است$'), confirmation),
                            MessageHandler(filters.Regex('^شروع دوباره$'), start)]
@@ -186,6 +229,22 @@ def main():
 
     app.add_handler(conv_handler)
     app.run_polling()
+
+
+DB_NAME = 'telegram_bot'
+TABLES = {}
+TABLES['students'] = (
+    "CREATE TABLE `students` ("
+    "  `id` int(11) NOT NULL,"
+    "  `student_number` int(8) NOT NULL,"
+    "  `first_name` varchar(14) NOT NULL,"
+    "  `last_name` varchar(16) NOT NULL,"
+    "  `sex` enum('M','F') NOT NULL,"
+    "  PRIMARY KEY (`student_number`)"
+    ") ENGINE=InnoDB")
+
+cnx = mysql.connector.connect(user='root', password='1234', host='127.0.0.1')
+cursor = cnx.cursor()
 
 
 def create_database(cursor):
@@ -221,22 +280,6 @@ def create_database(cursor):
 
     cursor.close()
     cnx.close()
-
-
-DB_NAME = 'telegram_bot'
-TABLES = {}
-TABLES['students'] = (
-    "CREATE TABLE `students` ("
-    "  `id` int(11) NOT NULL,"
-    "  `student_number` int(8) NOT NULL,"
-    "  `first_name` varchar(14) NOT NULL,"
-    "  `last_name` varchar(16) NOT NULL,"
-    "  `sex` enum('M','F') NOT NULL,"
-    "  PRIMARY KEY (`student_number`)"
-    ") ENGINE=InnoDB")
-
-cnx = mysql.connector.connect(user='root', password='1234', host='127.0.0.1')
-cursor = cnx.cursor()
 
 if __name__ == '__main__':
     create_database(cursor)
