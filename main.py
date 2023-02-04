@@ -16,7 +16,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-STUDENT_NUMBER, FNAME, LNAME, SEX, PASSWORD, CONFIRMATION = range(6)
+STUDENT_NUMBER, FNAME, LNAME, SEX, PASSWORD, CHECKPASSWORD, CONFIRMATION = range(7)
 
 TOKEN = "5806507050:AAFVm2zmYpAxDwjQtXr_MaROnYM_eZG8gwI"
 bot = telegram.Bot(token=TOKEN)
@@ -67,6 +67,24 @@ def check_student_data(student_number):
         for id in data:
             print(id)
             if id != 1:
+                check = True
+
+    cursor.close()
+    cnx.close()
+    return check
+
+
+def check_password_from_db(student_number, password):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+
+    check = False
+    query = ("SELECT password FROM students WHERE student_number = %d" % student_number)
+    cursor.execute(query)
+    for data in cursor:
+        for p in data:
+            print(id)
+            if p == password:
                 check = True
 
     cursor.close()
@@ -170,6 +188,26 @@ async def password(update, context):
     return CONFIRMATION
 
 
+async def check_password(update, context):
+    user = update.message.from_user
+    user_data = context.user_data
+
+    text = update.message.text
+    student_num = user_data['شماره دانشجویی']
+    print(student_num)
+
+    check = check_password_from_db(student_num, text)
+    logger.info("password of %s: %s checked", user.first_name, update.message.text)
+    if check:
+        await update.message.reply_text("با موفقیت وارد شدید.")
+        return ConversationHandler.END
+    else:
+        await update.message.reply_text("رمز ورود صحیح نیست. لطفا دوباره سعی کنید.")
+        await update.message.reply_text("اگر رمز ورود خود را فراموش کرده اید این موضوع را با ta درس درمیان بگذارید. "
+                                        "در غیر این صورت رمز عبور صحیح را وارد کنید:")
+        return PASSWORD
+
+
 async def confirmation(update, context):
     user = update.message.from_user
     user_data = context.user_data
@@ -238,6 +276,7 @@ def main():
             LNAME: [CommandHandler('start', start), MessageHandler(filters.TEXT, lname)],
             SEX: [CommandHandler('start', start), MessageHandler(filters.TEXT, sex)],
             PASSWORD: [CommandHandler('start', start), MessageHandler(filters.TEXT, password)],
+            CHECKPASSWORD: [CommandHandler('start', start), MessageHandler(filters.TEXT, check_password)],
             CONFIRMATION: [CommandHandler('start', start),
                            MessageHandler(filters.Regex('^مورد تایید است$'), confirmation),
                            MessageHandler(filters.Regex('^شروع دوباره$'), start)]
@@ -261,6 +300,7 @@ TABLES['students'] = (
     "  `student_number` int(8) NOT NULL,"
     "  `first_name` varchar(14) NOT NULL,"
     "  `last_name` varchar(16) NOT NULL,"
+    "  `password` varchar(20) NOT NULL,"
     "  `sex` enum('M','F') NOT NULL,"
     "  PRIMARY KEY (`student_number`)"
     ") ENGINE=InnoDB")
