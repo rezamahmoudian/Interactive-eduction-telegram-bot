@@ -50,6 +50,27 @@ def check_student_number(student_number):
             print(student_num)
             if student_num == student_number:
                 check = True
+
+    cursor.close()
+    cnx.close()
+    return check
+
+
+def check_student_data(student_number):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+
+    check = False
+    query = ("SELECT id FROM students WHERE student_number = %d" % student_number)
+    cursor.execute(query)
+    for data in cursor:
+        for id in data:
+            print(id)
+            if id != 1:
+                check = True
+
+    cursor.close()
+    cnx.close()
     return check
 
 
@@ -63,17 +84,18 @@ async def student_number(update, context):
     logger.info("student number of %s: %s", user.first_name, update.message.text)
 
     if check_student_number(int(text)):
-
-        await update.message.reply_text("خب؛ شماره دانشجوییت ثبت شد.")
-        await update.message.reply_text("متاسفانه هنوز مشخصاتت رو تکمیل نکردی لطفا مشخصاتت رو بگو ک ثبت کنم.")
-        await update.message.reply_text("قبل از هرچیزی اسمت رو برام بنویس.")
-        return FNAME
+        if check_student_data(int(text)):
+            await update.message.reply_text("ایول اطلاعاتت رو هم ک قبلا ثبت کردی.")
+            return ConversationHandler.END
+        else:
+            await update.message.reply_text("خب؛ شماره دانشجوییت ثبت شد.")
+            await update.message.reply_text("متاسفانه هنوز مشخصاتت رو تکمیل نکردی لطفا مشخصاتت رو بگو ک ثبت کنم.")
+            await update.message.reply_text("قبل از هرچیزی اسمت رو برام بنویس.")
+            return FNAME
     else:
         await update.message.reply_text("شماره دانشجویی شما در کلاس ثبت نیست.")
         await update.message.reply_text("اگر از دانشجویان کلاس هستید این موصوع را با ta در میان بگذارید.")
         return ConversationHandler.END
-
-
 
 
 async def fname(update, context):
@@ -280,6 +302,7 @@ def create_database(cursor):
 
     cursor.close()
     cnx.close()
+
 
 if __name__ == '__main__':
     create_database(cursor)
