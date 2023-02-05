@@ -66,7 +66,7 @@ def check_student_data(student_number):
     for data in cursor:
         for id in data:
             print(id)
-            if id != 1:
+            if id != -1:
                 check = True
 
     cursor.close()
@@ -74,12 +74,13 @@ def check_student_data(student_number):
     return check
 
 
-def check_password_from_db(student_number, password):
+def check_password_from_db(student_num, password):
     cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
     cursor = cnx.cursor()
 
     check = False
-    query = ("SELECT password FROM students WHERE student_number = %d" % student_number)
+    query = ("SELECT password FROM students WHERE student_number = {}".format(student_num))
+    print(query)
     cursor.execute(query)
     for data in cursor:
         for p in data:
@@ -104,7 +105,8 @@ async def student_number(update, context):
     if check_student_number(int(text)):
         if check_student_data(int(text)):
             await update.message.reply_text("ایول اطلاعاتت رو هم ک قبلا ثبت کردی.")
-            return ConversationHandler.END
+            await update.message.reply_text("برای ورود رمز ورود رو بنویس")
+            return CHECKPASSWORD
         else:
             await update.message.reply_text("خب؛ شماره دانشجوییت ثبت شد.")
             await update.message.reply_text("متاسفانه هنوز مشخصاتت رو تکمیل نکردی لطفا مشخصاتت رو بگو ک ثبت کنم.")
@@ -112,8 +114,9 @@ async def student_number(update, context):
             return FNAME
     else:
         await update.message.reply_text("شماره دانشجویی شما در کلاس ثبت نیست.")
+        await update.message.reply_text("لطفا شماره دانشجویی صحیح را وارد کنید.")
         await update.message.reply_text("اگر از دانشجویان کلاس هستید این موصوع را با ta در میان بگذارید.")
-        return ConversationHandler.END
+        return STUDENT_NUMBER
 
 
 async def fname(update, context):
@@ -248,15 +251,15 @@ def add_student(user_id, user_data):
     cursor = cnx.cursor()
 
     update_student = ("UPDATE students"
-                      " SET id = %s, first_name = %s, last_name = %s, sex = %s"
+                      " SET id = %s, first_name = %s, last_name = %s, sex = %s, password = %s"
                       "WHERE student_number = %s")
     print(update_student)
     # add_student = ("INSERT INTO students "
     #                "(id, student_number, first_name, last_name, sex)"
     #                "VALUES (%s, %s, %s, %s, %s)")
 
-    data_student = (user_id, items[1], items[2], sex, items[0])
-    print(data_student)
+    data_student = (user_id, items[1], items[2], sex, items[4], items[0])
+    print("262_ ", data_student)
     cursor.execute(update_student, data_student)
     cnx.commit()
 
