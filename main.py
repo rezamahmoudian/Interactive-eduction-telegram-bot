@@ -30,12 +30,36 @@ markup = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True, one_time_keyb
 
 
 async def start(update, context):
-    await update.message.reply_text(
-        "سلام من ربات مدیریت کلاس برنامه سازی پیشرفته هستم.اگه میخوای توی این کلاس شرکت کنی شماره دانشجوییت رو برام "
-        "بنویس")
     user = update.message.from_user
     user_data = context.user_data
-    return STUDENT_NUMBER
+
+    if check_telegram_id_exist(user.id):
+        await update.message.reply_text("با موفقیت وارد شدید!")
+        return ConversationHandler.END
+    else:
+        await update.message.reply_text(
+            "سلام من ربات مدیریت کلاس برنامه سازی پیشرفته هستم.اگه میخوای توی این کلاس شرکت کنی شماره دانشجوییت رو "
+            "برام بنویس")
+
+        return STUDENT_NUMBER
+
+
+def check_telegram_id_exist(user_id):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+
+    check = False
+    query = "SELECT id FROM students"
+    cursor.execute(query)
+    for data in cursor:
+        for id in data:
+            print(id)
+            if id == user_id:
+                check = True
+
+    cursor.close()
+    cnx.close()
+    return check
 
 
 def check_student_number(student_number):
