@@ -36,6 +36,8 @@ async def start(update, context):
     if check_telegram_id_exist(user.id) and check_log(user.id):
         await update.message.reply_text("با موفقیت وارد شدید!")
         return ConversationHandler.END
+    elif check_telegram_id_exist(user.id):
+        await update.message.reply_text("برای ورود شماره دانشجویی خود را وارد کنید!")
     else:
         await update.message.reply_text(
             "سلام من ربات مدیریت کلاس برنامه سازی پیشرفته هستم.اگه میخوای توی این کلاس شرکت کنی شماره دانشجوییت رو "
@@ -57,12 +59,17 @@ def login(student_num):
     cnx.close()
 
 
-async def logout(student_num):
+async def logout(update, context):
+    user = update.message.from_user
+    user_data = context.user_data
+
     cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
     cursor = cnx.cursor()
 
-    query = "UPDATE students SET login = 0 WHERE student_number = %s"
-    cursor.execute(query, student_num)
+    query = "UPDATE `telegram_bot`.`students` SET login = 0 WHERE id = %d" % user.id
+    print(query)
+    await update.message.reply_text("با موفقیت از حساب کاربری خود خارج شدید")
+    cursor.execute(query)
     cnx.commit()
 
     cursor.close()
