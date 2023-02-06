@@ -33,6 +33,7 @@ async def start(update, context):
     user = update.message.from_user
     user_data = context.user_data
 
+
     if check_telegram_id_exist(user.id):
         await update.message.reply_text("با موفقیت وارد شدید!")
         return ConversationHandler.END
@@ -42,6 +43,28 @@ async def start(update, context):
             "برام بنویس")
 
         return STUDENT_NUMBER
+
+def login(student_num):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+
+    query = "UPDATE students SET login = 1 WHERE student_number = %s"
+    cursor.execute(query, student_num)
+
+    cursor.close()
+    cnx.close()
+
+
+async def logout(student_num):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+
+    query = "UPDATE students SET login = 0 WHERE student_number = %s"
+    cursor.execute(query, student_num)
+
+    cursor.close()
+    cnx.close()
+
 
 
 def check_telegram_id_exist(user_id):
@@ -80,12 +103,12 @@ def check_student_number(student_number):
     return check
 
 
-def check_student_data(student_number):
+def check_student_data(student_num):
     cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
     cursor = cnx.cursor()
 
     check = False
-    query = ("SELECT id FROM students WHERE student_number = %d" % student_number)
+    query = ("SELECT id FROM students WHERE student_number = %d" % student_num)
     cursor.execute(query)
     for data in cursor:
         for id in data:
@@ -227,6 +250,7 @@ async def check_password(update, context):
     logger.info("password of %s: %s checked", user.first_name, update.message.text)
     if check:
         await update.message.reply_text("با موفقیت وارد شدید.")
+        login(student_num)
         return ConversationHandler.END
     else:
         await update.message.reply_text("رمز ورود صحیح نیست. لطفا دوباره سعی کنید.")
@@ -242,9 +266,10 @@ async def confirmation(update, context):
 
     add_student(user.id, user_data)
 
-    await update.message.reply_text("نام شما در کلاس ثبت شد!")
+    await update.message.reply_text("اطلاعات شما ثبت شد!")
+    await update.message.reply_text("برای ورود شماره دانشجوییت رو وارد کن!")
 
-    return ConversationHandler.END
+    return STUDENT_NUMBER
 
 
 async def cancel(update, context):
@@ -312,10 +337,12 @@ def main():
         fallbacks=[CommandHandler('cancle', cancel)]
     )
 
+
     # app.run_webhook(listen='0.0.0.0', port=PORT, url_path=TOKEN)
     # telegram.Bot.set_webhook('https://cb7921f3.ngrok.io/' + TOKEN)
 
     app.add_handler(conv_handler)
+    app.add_handler(CommandHandler('logout', logout))
     app.run_polling()
 
 
@@ -329,6 +356,7 @@ TABLES['students'] = (
     "  `last_name` varchar(16) NOT NULL,"
     "  `password` varchar(20) NOT NULL,"
     "  `sex` enum('M','F') NOT NULL,"
+    "  `login` int(2) NOT NULL,"
     "  PRIMARY KEY (`student_number`)"
     ") ENGINE=InnoDB")
 
