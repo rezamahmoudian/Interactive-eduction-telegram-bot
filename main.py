@@ -33,8 +33,7 @@ async def start(update, context):
     user = update.message.from_user
     user_data = context.user_data
 
-
-    if check_telegram_id_exist(user.id):
+    if check_telegram_id_exist(user.id) and check_log(user.id):
         await update.message.reply_text("با موفقیت وارد شدید!")
         return ConversationHandler.END
     else:
@@ -44,12 +43,15 @@ async def start(update, context):
 
         return STUDENT_NUMBER
 
+
 def login(student_num):
     cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
     cursor = cnx.cursor()
 
-    query = "UPDATE students SET login = 1 WHERE student_number = %s"
-    cursor.execute(query, student_num)
+    query = "UPDATE `telegram_bot`.`students` SET login = 1 WHERE student_number = %d" % int(student_num)
+    print(query)
+    cursor.execute(query)
+    cnx.commit()
 
     cursor.close()
     cnx.close()
@@ -61,10 +63,28 @@ async def logout(student_num):
 
     query = "UPDATE students SET login = 0 WHERE student_number = %s"
     cursor.execute(query, student_num)
+    cnx.commit()
 
     cursor.close()
     cnx.close()
 
+
+def check_log(user_id):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+
+    check = False
+    query = "SELECT login FROM students WHERE id = %d" % user_id
+    cursor.execute(query)
+    for data in cursor:
+        if data[0] == 1:
+            check = True
+        else:
+            check = False
+
+    cursor.close()
+    cnx.close()
+    return check
 
 
 def check_telegram_id_exist(user_id):
@@ -244,7 +264,7 @@ async def check_password(update, context):
 
     text = update.message.text
     student_num = user_data['شماره دانشجویی']
-    print(student_num)
+    print("student num for check password: "+ str(student_num))
 
     check = check_password_from_db(student_num, text)
     logger.info("password of %s: %s checked", user.first_name, update.message.text)
@@ -336,7 +356,6 @@ def main():
 
         fallbacks=[CommandHandler('cancle', cancel)]
     )
-
 
     # app.run_webhook(listen='0.0.0.0', port=PORT, url_path=TOKEN)
     # telegram.Bot.set_webhook('https://cb7921f3.ngrok.io/' + TOKEN)
