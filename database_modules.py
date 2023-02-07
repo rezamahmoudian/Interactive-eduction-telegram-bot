@@ -67,6 +67,19 @@ def login(student_num):
     cnx.close()
 
 
+def logout_db(user_id):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+
+    query = "UPDATE `telegram_bot`.`students` SET login = 0 WHERE id = %d" % user_id
+    print(query)
+
+    cursor.execute(query)
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+
 def check_log(user_id):
     cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
     cursor = cnx.cursor()
@@ -138,7 +151,6 @@ def check_password_from_db(student_num, password):
     cursor.close()
     cnx.close()
     return check
-
 
 
 def check_telegram_id_exist(user_id):
