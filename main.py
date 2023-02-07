@@ -32,18 +32,30 @@ markup = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True, one_time_keyb
 async def start(update, context):
     user = update.message.from_user
     user_data = context.user_data
+    text = update.message.text
+    print(text)
 
     if check_telegram_id_exist(user.id) and check_log(user.id):
         await update.message.reply_text("با موفقیت وارد شدید!")
         return ConversationHandler.END
-    elif check_telegram_id_exist(user.id):
+    elif check_telegram_id_exist(user.id) or text == "/login":
         await update.message.reply_text("برای ورود شماره دانشجویی خود را وارد کنید!")
+        return STUDENT_NUMBER
     else:
         await update.message.reply_text(
             "سلام من ربات مدیریت کلاس برنامه سازی پیشرفته هستم.اگه میخوای توی این کلاس شرکت کنی شماره دانشجوییت رو "
             "برام بنویس")
 
         return STUDENT_NUMBER
+
+
+# async def login(update, context):
+#     user = update.message.from_user
+#     user_data = context.user_data
+#
+#     await update.message.reply_text("برای ورود شماره دانشجویی خود را وارد کنید!")
+#     return STUDENT_NUMBER
+
 
 
 def login(student_num):
@@ -178,13 +190,14 @@ async def student_number(update, context):
 
     if check_student_number(int(text)):
         if check_student_data(int(text)):
-            await update.message.reply_text("ایول اطلاعاتت رو هم ک قبلا ثبت کردی.")
+            # await update.message.reply_text("ایول اطلاعاتت رو هم ک قبلا ثبت کردی.")
             await update.message.reply_text("برای ورود رمز ورود رو بنویس")
             return CHECKPASSWORD
         else:
-            await update.message.reply_text("خب؛ شماره دانشجوییت ثبت شد.")
-            await update.message.reply_text("متاسفانه هنوز مشخصاتت رو تکمیل نکردی لطفا مشخصاتت رو بگو ک ثبت کنم.")
-            await update.message.reply_text("قبل از هرچیزی اسمت رو برام بنویس.")
+            await update.message.reply_text("شماره دانشجویی شما ثبت شده است.")
+            await update.message.reply_text("ولی متاسفانه هنوز مشخصاتتان را تکمیل نکرده اید لطفا مشخصات خود را ثبت "
+                                            "کنید.")
+            await update.message.reply_text("نام خود را وارد کنید:")
             return FNAME
     else:
         await update.message.reply_text("شماره دانشجویی شما در کلاس ثبت نیست.")
@@ -202,8 +215,8 @@ async def fname(update, context):
 
     logger.info("first name of %s: %s", user.first_name, update.message.text)
 
-    await update.message.reply_text("چ اسم قشنگی☺️")
-    await update.message.reply_text("حالا فامیلیت رو هم برام بنویس.")
+    await update.message.reply_text("بسیار عالی")
+    await update.message.reply_text("حالا نام خانوادگی خود را وارد کنید:")
 
     return LNAME
 
@@ -217,7 +230,7 @@ async def lname(update, context):
 
     logger.info("last name of %s: %s", user.first_name, update.message.text)
 
-    await update.message.reply_text("بسیار عالی؛ حالا جنسیت خودت رو انتخاب کن.", reply_markup=markup_sex)
+    await update.message.reply_text("جنسیت خودت رو انتخاب کن.", reply_markup=markup_sex)
 
     return SEX
 
@@ -271,7 +284,7 @@ async def check_password(update, context):
 
     text = update.message.text
     student_num = user_data['شماره دانشجویی']
-    print("student num for check password: "+ str(student_num))
+    print("student num for check password: " + str(student_num))
 
     check = check_password_from_db(student_num, text)
     logger.info("password of %s: %s checked", user.first_name, update.message.text)
@@ -283,7 +296,7 @@ async def check_password(update, context):
         await update.message.reply_text("رمز ورود صحیح نیست. لطفا دوباره سعی کنید.")
         await update.message.reply_text("اگر رمز ورود خود را فراموش کرده اید این موضوع را با ta درس درمیان بگذارید. "
                                         "در غیر این صورت رمز عبور صحیح را وارد کنید:")
-        return PASSWORD
+        return CHECKPASSWORD
 
 
 async def confirmation(update, context):
@@ -293,7 +306,7 @@ async def confirmation(update, context):
 
     add_student(user.id, user_data)
 
-    await update.message.reply_text("اطلاعات شما ثبت شد!")
+    await update.message.reply_text("اطلاعات شما ثبت شد!", reply_markup=ReplyKeyboardRemove())
     await update.message.reply_text("برای ورود شماره دانشجوییت رو وارد کن!")
 
     return STUDENT_NUMBER
@@ -347,22 +360,30 @@ def main():
     app = ApplicationBuilder().token("5806507050:AAFVm2zmYpAxDwjQtXr_MaROnYM_eZG8gwI").build()
 
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
+        entry_points=[CommandHandler('start', start), CommandHandler('login', start)],
 
         states={
-            STUDENT_NUMBER: [CommandHandler('start', start), MessageHandler(filters.TEXT, student_number)],
-            FNAME: [CommandHandler('start', start), MessageHandler(filters.TEXT, fname)],
-            LNAME: [CommandHandler('start', start), MessageHandler(filters.TEXT, lname)],
-            SEX: [CommandHandler('start', start), MessageHandler(filters.TEXT, sex)],
-            PASSWORD: [CommandHandler('start', start), MessageHandler(filters.TEXT, password)],
-            CHECKPASSWORD: [CommandHandler('start', start), MessageHandler(filters.TEXT, check_password)],
-            CONFIRMATION: [CommandHandler('start', start),
+            STUDENT_NUMBER: [CommandHandler('start', start),CommandHandler('login', start), MessageHandler(filters.TEXT, student_number)],
+            FNAME: [CommandHandler('start', start), CommandHandler('login', start), MessageHandler(filters.TEXT, fname)],
+            LNAME: [CommandHandler('start', start), CommandHandler('login', start), MessageHandler(filters.TEXT, lname)],
+            SEX: [CommandHandler('start', start), CommandHandler('login', start), MessageHandler(filters.TEXT, sex)],
+            PASSWORD: [CommandHandler('start', start), CommandHandler('login', start), MessageHandler(filters.TEXT, password)],
+            CHECKPASSWORD: [CommandHandler('start', start), CommandHandler('login', start), MessageHandler(filters.TEXT, check_password)],
+            CONFIRMATION: [CommandHandler('start', start),CommandHandler('login', start),
                            MessageHandler(filters.Regex('^مورد تایید است$'), confirmation),
                            MessageHandler(filters.Regex('^شروع دوباره$'), start)]
         },
 
         fallbacks=[CommandHandler('cancle', cancel)]
     )
+
+    # login = CommandHandler(
+    #     entry_points=[CommandHandler('login', login)],
+    #
+    #     states={
+    #
+    #     }
+    # )
 
     # app.run_webhook(listen='0.0.0.0', port=PORT, url_path=TOKEN)
     # telegram.Bot.set_webhook('https://cb7921f3.ngrok.io/' + TOKEN)
