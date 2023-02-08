@@ -27,6 +27,16 @@ def create_database():
         "  PRIMARY KEY (`id`)"
         ") ENGINE=InnoDB")
 
+    TABLES['cards1'] = (
+        "CREATE TABLE `cards1` ("
+        "  `id` int(11) NOT NULL,"
+        "  `student_id` int(8) NOT NULL,"
+        "  `subject_id` int(8) NOT NULL,"
+        "  PRIMARY KEY (`id`),"
+        "   FOREIGN KEY (student_id) REFERENCES students(student_number),"
+        "   FOREIGN KEY (subject_id) REFERENCES cards(id)"
+        ") ENGINE=InnoDB")
+
     cnx = mysql.connector.connect(user='root', password='1234', host='127.0.0.1')
     cursor = cnx.cursor()
 
