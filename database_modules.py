@@ -14,7 +14,17 @@ def create_database():
         "  `password` varchar(20) NOT NULL,"
         "  `sex` enum('M','F') NOT NULL,"
         "  `login` int(2) NOT NULL,"
-        "  PRIMARY KEY (`student_number`)"
+        "  PRIMARY KEY (`id`)"
+        ") ENGINE=InnoDB")
+
+    TABLES['cards'] = (
+        "CREATE TABLE `cards` ("
+        "  `id` int(11) NOT NULL,"
+        "  `week` int(8) NOT NULL,"
+        "  `title` varchar(200) NOT NULL,"
+        "  `description` text ,"
+        "  `topic` varchar(20) NOT NULL,"
+        "  PRIMARY KEY (`id`)"
         ") ENGINE=InnoDB")
 
     cnx = mysql.connector.connect(user='root', password='1234', host='127.0.0.1')
