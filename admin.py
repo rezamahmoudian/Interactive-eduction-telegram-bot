@@ -123,22 +123,6 @@ def create_leader_cards(man, female):
     return leader_cards
 
 
-def add_leader_cards_db(leader_cards):
-    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
-    cursor = cnx.cursor()
-    for data in leader_cards:
-        add_card = "INSERT INTO `telegram_bot`.`leader_cards`(`student_id`,`topic`,`description`) VALUES" \
-                   " ( {student_id} , '{topic}' , 'description');".format(student_id=data[1], topic=str(data[0]))
-        print(add_card)
-        cursor.execute(add_card)
-        cursor = cnx.cursor()
-
-    cnx.commit()
-
-    cursor.close()
-    cnx.close()
-
-
 def create_cards():
     cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
     cursor = cnx.cursor()
@@ -211,5 +195,47 @@ def create_cards():
     return cards
 
 
+def add_leader_cards_db(leader_cards):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+    for data in leader_cards:
+        add_card = "INSERT INTO `telegram_bot`.`leader_cards`(`student_id`,`topic`,`description`) VALUES" \
+                   " ( {student_id} , '{topic}' , 'description');".format(student_id=data[1], topic=str(data[0]))
+        print(add_card)
+        cursor.execute(add_card)
+        cursor = cnx.cursor()
+
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+
+def add_cards_db():
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+    delete_leader_cards = "DELETE FROM leader_cards WHERE id != 0;"
+    cursor.execute(delete_leader_cards)
+
+    cursor = cnx.cursor()
+    delete_cards = "DELETE FROM cards1 WHERE id != 0;"
+    cursor.execute(delete_cards)
+    cnx.commit()
+    cursor.close()
+
+    cards = create_cards()
+    cursor = cnx.cursor()
+    for data in cards:
+        for i in range(len(data)-1):
+            add_card = "INSERT INTO `telegram_bot`.`cards1`(`student_id`,`subject_id`) VALUES " \
+                       "({student_id},{subject_id})".format(student_id=data[i+1], subject_id=data[0])
+            print(add_card)
+            cursor.execute(add_card)
+            cursor = cnx.cursor()
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+
 if __name__ == '__main__':
-    create_cards()
+    add_cards_db()

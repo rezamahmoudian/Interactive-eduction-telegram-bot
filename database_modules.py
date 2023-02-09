@@ -29,7 +29,7 @@ def create_database():
 
     TABLES['cards1'] = (
         "CREATE TABLE `cards1` ("
-        "  `id` int(11) NOT NULL,"
+        "  `id` int(11) NOT NULL AUTO_INCREMENT,"
         "  `student_id` int(8) NOT NULL,"
         "  `subject_id` int(8) NOT NULL,"
         "  PRIMARY KEY (`id`),"
