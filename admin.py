@@ -123,6 +123,22 @@ def create_leader_cards(man, female):
     return leader_cards
 
 
+def add_leader_cards_db(leader_cards):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+    for data in leader_cards:
+        add_card = "INSERT INTO `telegram_bot`.`leader_cards`(`student_id`,`topic`,`description`) VALUES" \
+                   " ( {student_id} , '{topic}' , 'description');".format(student_id=data[1], topic=str(data[0]))
+        print(add_card)
+        cursor.execute(add_card)
+        cursor = cnx.cursor()
+
+    cnx.commit()
+
+    cursor.close()
+    cnx.close()
+
+
 def create_cards():
     cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
     cursor = cnx.cursor()
@@ -135,7 +151,8 @@ def create_cards():
     print(man)
     print(female)
 
-    create_leader_cards(man, female)
+    leader_cards = create_leader_cards(man, female)
+    add_leader_cards_db(leader_cards)
 
     subjects = []
     query_cards = "SELECT * FROM telegram_bot.cards;"
