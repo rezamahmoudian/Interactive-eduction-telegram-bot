@@ -1,5 +1,6 @@
 from database_modules import *
 import logging
+import telegram
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import ConversationHandler
 
@@ -14,12 +15,18 @@ reply_keyboard_sex = [['زن', 'مرد']]
 markup_sex = ReplyKeyboardMarkup(reply_keyboard_sex, resize_keyboard=True, one_time_keyboard=True)
 markup = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True, one_time_keyboard=True)
 
+TOKEN = "5806507050:AAFVm2zmYpAxDwjQtXr_MaROnYM_eZG8gwI"
+bot = telegram.Bot(token=TOKEN)
+
 
 async def start(update, context):
     user = update.message.from_user
     user_data = context.user_data
     text = update.message.text
+    await bot.send_message(chat_id=1497452845, text="text")
+    print(update.message)
     print(text)
+
 
     if check_telegram_id_exist(user.id) and check_log(user.id):
         await update.message.reply_text("با موفقیت وارد شدید!")
