@@ -59,7 +59,8 @@ def main():
                            MessageHandler(filters.TEXT, choose_action),
                            ],
             CREATECARDS: [CommandHandler('admin', admin),
-                          MessageHandler(filters.TEXT, add_cards_db),
+                          MessageHandler(filters.Regex('^بله$'), add_cards_db),
+                          MessageHandler(filters.Regex('^خیر'), create_card_cancel),
                           ]
         },
         fallbacks=[CommandHandler('cancle', cancle)]

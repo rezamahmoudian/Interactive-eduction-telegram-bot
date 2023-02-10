@@ -8,7 +8,9 @@ admin_reply_keyboard = [['حذف موضوع', 'افزودن موضوع'],
                         ['حذف همه ی موضوعات', 'نمایش موضوعات'],
                         ['بازگردانی کارتها', 'پخش کارتها', 'ایجاد کارتها'],
                         ['مشاهده ی اطلاعات کاربران']]
+confirm_keyboard = [['خیر', 'بله']]
 admin_markup = ReplyKeyboardMarkup(admin_reply_keyboard, resize_keyboard=True, one_time_keyboard=True)
+confirm_markup = ReplyKeyboardMarkup(confirm_keyboard, resize_keyboard=True, one_time_keyboard=True)
 
 CHECKADMINPASS, CHOOSEACTION, ADDSUB, DELETESUB, SHOWSUBJECTS, DELETEALLSUBJECTS, CREATECARDS, BROADCASTCARDS, RETURNCARDS, SHOWUSERINFORMATION = range(
     10)
@@ -56,6 +58,7 @@ async def choose_action(update, context):
     elif text == 'حذف همه ی موضوعات':
         return DELETEALLSUBJECTS
     elif text == 'ایجاد کارتها':
+        await update.message.reply_text("آیا از مطمئن هستید؟", reply_markup=confirm_markup)
         return CREATECARDS
     elif text == 'پخش کارتها':
         return BROADCASTCARDS
@@ -66,6 +69,11 @@ async def choose_action(update, context):
     else:
         await update.message.reply_text("لطفا دستور صحیح را وارد کنید.")
         return CHOOSEACTION
+
+
+async def create_card_cancel(update, context):
+    await update.message.reply_text("ایجاد کارتها لغو شد!", reply_markup=admin_markup)
+    return CHOOSEACTION
 
 
 def get_man_students():
@@ -238,7 +246,7 @@ async def add_cards_db(update, context):
     cnx.commit()
     cursor.close()
     cnx.close()
-    await update.message.reply_text("کارتها با موفقیت در دیتابیس ایجاد شدند.")
+    await update.message.reply_text("کارتها با موفقیت در دیتابیس ایجاد شدند.", reply_markup=admin_markup)
     return CHOOSEACTION
 
 
