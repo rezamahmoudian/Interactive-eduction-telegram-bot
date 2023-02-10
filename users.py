@@ -23,7 +23,10 @@ async def start(update, context):
     user = update.message.from_user
     user_data = context.user_data
     text = update.message.text
-    await bot.send_message(chat_id=1497452845, text="text")
+    try:
+        await bot.send_message(chat_id=-1, text="text")
+    except:
+        print("chat with id %d not fount")
     print(update.message)
     print(text)
 

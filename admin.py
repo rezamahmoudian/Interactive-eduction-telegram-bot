@@ -2,6 +2,7 @@ import mysql.connector
 from mysql.connector import errorcode
 import random
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
+from main import bot
 
 admin_reply_keyboard = [['حذف موضوع', 'افزودن موضوع'],
                         ['حذف همه ی موضوعات', 'نمایش موضوعات'],
@@ -9,7 +10,8 @@ admin_reply_keyboard = [['حذف موضوع', 'افزودن موضوع'],
                         ['مشاهده ی اطلاعات کاربران']]
 admin_markup = ReplyKeyboardMarkup(admin_reply_keyboard, resize_keyboard=True, one_time_keyboard=True)
 
-CHECKADMINPASS, CHOOSEACTION, ADDSUB, DELETESUB, SHOWSUBJECTS, DELETEALLSUBJECTS, CREATECARDS, BROADCASTCARDS, RETURNCARDS, SHOWUSERINFORMATION = range(10)
+CHECKADMINPASS, CHOOSEACTION, ADDSUB, DELETESUB, SHOWSUBJECTS, DELETEALLSUBJECTS, CREATECARDS, BROADCASTCARDS, RETURNCARDS, SHOWUSERINFORMATION = range(
+    10)
 
 
 async def admin(update, context):
@@ -224,7 +226,6 @@ async def add_cards_db(update, context):
     cursor.execute(delete_cards)
     cnx.commit()
     cursor.close()
-
     cards = create_cards()
     cursor = cnx.cursor()
     for data in cards:
@@ -241,9 +242,117 @@ async def add_cards_db(update, context):
     return CHOOSEACTION
 
 
+def get_leader_nums():
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+    # get_leader_topic(9901123)
+    # get_leader_description(9901119)
+    query = "SELECT student_id FROM telegram_bot.leader_cards;"
+    cursor.execute(query)
+    leader_nums = []
+    for data in cursor:
+        for student_num in data:
+            leader_nums.append(student_num)
+    print(leader_nums)
+    cursor.close()
+    cnx.close()
+    return leader_nums
+
+
+def get_student_chat_id(student_num):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+    student_chat_id = 1
+    query = "SELECT id FROM telegram_bot.students WHERE student_number=%d;" % student_num
+    cursor.execute(query)
+    for data in cursor:
+        student_chat_id = data[0]
+    cursor.close()
+    cnx.close()
+    print(student_chat_id)
+    return student_chat_id
+
+
+def get_student_fname(student_num):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+    first_name = ''
+    query = "SELECT first_name FROM telegram_bot.students WHERE student_number=%d;" % student_num
+    cursor.execute(query)
+    for data in cursor:
+        first_name = data[0]
+    cursor.close()
+    cnx.close()
+    print(first_name)
+    return first_name
+
+
+def get_student_lname(student_num):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+    last_name = ''
+    query = "SELECT last_name FROM telegram_bot.students WHERE student_number=%d;" % student_num
+    cursor.execute(query)
+    for data in cursor:
+        last_name = data[0]
+    cursor.close()
+    cnx.close()
+    print(last_name)
+    return last_name
+
+
+def get_leader_topic(student_num):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+    topic = ''
+    query = "SELECT topic FROM telegram_bot.leader_cards WHERE student_id=%d;" % student_num
+    cursor.execute(query)
+    for data in cursor:
+        topic = data[0]
+    cursor.close()
+    cnx.close()
+    print(topic)
+    return topic
+
+
+def get_leader_description(student_num):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+    description = ''
+    query = "SELECT description FROM telegram_bot.leader_cards WHERE student_id=%d;" % student_num
+    cursor.execute(query)
+    for data in cursor:
+        description = data[0]
+    cursor.close()
+    cnx.close()
+    print(description)
+    return description
+
+
+async def broadcast_leader_cards():
+    leader_nums = get_leader_nums()
+    for student_number in leader_nums:
+        first_name = get_student_fname(student_number)
+        last_name = get_student_lname(student_number)
+        chat_id = get_student_chat_id(student_number)
+        topic = get_leader_topic(student_number)
+        description = get_leader_description(student_number)
+
+        text = " \n سلام {fname} {lname} عزیز با شماره دانشجویی {student_num}" \
+               "\n شما در جلسه ی آینده به عنوان سرگروه انتخاب شده اید" \
+               " \n.میباشد {top} موضوع گروه شما در جلسه ی آینده " \
+               "\n{descrip} :توضیحات".format(fname=first_name, lname=last_name, student_num=student_number, top=topic,
+                                             descrip=description)
+        print(text)
+        try:
+            await bot.send_message(chat_id=chat_id, text=text)
+        except:
+            print("chat with id %d not fount" % chat_id)
+
+
 def broadcast_cards():
     pass
 
 
 if __name__ == '__main__':
-    add_cards_db()
+    broadcast_leader_cards()
