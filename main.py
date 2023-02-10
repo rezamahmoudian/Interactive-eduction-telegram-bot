@@ -46,7 +46,17 @@ def main():
 
         fallbacks=[CommandHandler('cancle', cancle)]
     )
-    
+    admin_conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('admin', admin)],
+        states={
+        CHECKADMINPASS: [CommandHandler('admin', admin),
+                        MessageHandler(filters.TEXT, check_admin_pass)],
+        CHOOSEACTION:   [CommandHandler('admin', admin),
+                         MessageHandler(filters.Regex('^ایجاد کارتها$'), add_cards_db),
+                         MessageHandler(filters.Regex('^پخش کارتها$'), broadcast_cards),
+                         ]
+        }
+    )
 
 
 
