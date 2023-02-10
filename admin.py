@@ -5,12 +5,11 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 
 admin_reply_keyboard = [['حذف موضوع', 'افزودن موضوع'],
                         ['حذف همه ی موضوعات', 'نمایش موضوعات'],
-                        ['بازگردانی کارتهای پخش شده', 'پخش کارتها', 'ایجاد کارتها'],
+                        ['بازگردانی کارتها', 'پخش کارتها', 'ایجاد کارتها'],
                         ['مشاهده ی اطلاعات کاربران']]
 admin_markup = ReplyKeyboardMarkup(admin_reply_keyboard, resize_keyboard=True, one_time_keyboard=True)
 
-CHECKADMINPASS, CHOOSEACTION, ADDSUB, DELETESUB, SHOWSUBJECTS, DELETEALLSUBJECTS, BROADCASTCARDS, RETURNCARDS, SHOWUSERINFORMATION = range(
-    9)
+CHECKADMINPASS, CHOOSEACTION, ADDSUB, DELETESUB, SHOWSUBJECTS, DELETEALLSUBJECTS, CREATECARDS, BROADCASTCARDS, RETURNCARDS, SHOWUSERINFORMATION = range(10)
 
 
 async def admin(update, context):
@@ -54,6 +53,8 @@ async def choose_action(update, context):
         return SHOWSUBJECTS
     elif text == 'حذف همه ی موضوعات':
         return DELETEALLSUBJECTS
+    elif text == 'ایجاد کارتها':
+        return CREATECARDS
     elif text == 'پخش کارتها':
         return BROADCASTCARDS
     elif text == 'بازگردانی کارتهای پخش شده':
@@ -212,7 +213,7 @@ def add_leader_cards_db(leader_cards):
     cnx.close()
 
 
-def add_cards_db():
+async def add_cards_db(update, context):
     cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
     cursor = cnx.cursor()
     delete_leader_cards = "DELETE FROM leader_cards WHERE id != 0;"
@@ -236,6 +237,8 @@ def add_cards_db():
     cnx.commit()
     cursor.close()
     cnx.close()
+    await update.message.reply_text("کارتها با موفقیت در دیتابیس ایجاد شدند.")
+    return CHOOSEACTION
 
 
 def broadcast_cards():

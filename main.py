@@ -49,20 +49,26 @@ def main():
     admin_conv_handler = ConversationHandler(
         entry_points=[CommandHandler('admin', admin)],
         states={
-        CHECKADMINPASS: [CommandHandler('admin', admin),
-                        MessageHandler(filters.TEXT, check_admin_pass)],
-        CHOOSEACTION:   [CommandHandler('admin', admin),
-                         MessageHandler(filters.Regex('^ایجاد کارتها$'), add_cards_db),
-                         MessageHandler(filters.Regex('^پخش کارتها$'), broadcast_cards),
-                         ]
-        }
+            CHECKADMINPASS: [CommandHandler('admin', admin),
+                             MessageHandler(filters.TEXT, check_admin_pass)],
+            # CHOOSEACTION: [CommandHandler('admin', admin),
+            #                MessageHandler(filters.Regex('^ایجاد کارتها$'), add_cards_db),
+            #                MessageHandler(filters.Regex('^پخش کارتها$'), broadcast_cards),
+            #                ]
+            CHOOSEACTION: [CommandHandler('admin', admin),
+                           MessageHandler(filters.TEXT, choose_action),
+                           ],
+            CREATECARDS: [CommandHandler('admin', admin),
+                          MessageHandler(filters.TEXT, add_cards_db),
+                          ]
+        },
+        fallbacks=[CommandHandler('cancle', cancle)]
     )
-
-
 
     # telegram.Message(message_id=1, text="hiiiii",chat=telegram.Chat(id=1497452845, type="PRIVATE") , migrate_to_chat_id=1497452845, date=datetime.now())
     # telegram.Bot.send_message()
     app.add_handler(conv_handler)
+    app.add_handler(admin_conv_handler)
     app.add_handler(CommandHandler('logout', logout))
 
     app.run_polling()
