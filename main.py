@@ -8,8 +8,11 @@ import mysql.connector
 from mysql.connector import errorcode
 from database_modules import *
 from users import *
+from dotenv import load_dotenv
 
-TOKEN = "5806507050:AAFVm2zmYpAxDwjQtXr_MaROnYM_eZG8gwI"
+load_dotenv()
+TOKEN = os.getenv('TELEGRAM_TOKEN')
+
 bot = telegram.Bot(token=TOKEN)
 
 PORT = int(os.environ.get('PORT', 5000))
@@ -20,7 +23,7 @@ def error(update, context):
 
 
 def main():
-    app = ApplicationBuilder().token("5806507050:AAFVm2zmYpAxDwjQtXr_MaROnYM_eZG8gwI").build()
+    app = ApplicationBuilder().token(TOKEN).build()
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start), CommandHandler('login', start)],
