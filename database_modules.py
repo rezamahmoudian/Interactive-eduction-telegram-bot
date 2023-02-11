@@ -2,6 +2,15 @@ import mysql.connector
 from mysql.connector import errorcode
 
 
+def database_connector():
+    cnx = mysql.connector.connect(user='root', password='1234', host='127.0.0.1')
+    return cnx
+
+
+def database_disconect(cnx):
+    cnx.close()
+
+# USERS
 def create_database():
     DB_NAME = 'telegram_bot'
     TABLES = {}
@@ -47,7 +56,7 @@ def create_database():
         "   FOREIGN KEY (student_id) REFERENCES students(student_number)"
         ") ENGINE=InnoDB")
 
-    cnx = mysql.connector.connect(user='root', password='1234', host='127.0.0.1')
+    cnx = database_connector()
     cursor = cnx.cursor()
 
     try:
@@ -81,11 +90,11 @@ def create_database():
             print("OK")
 
     cursor.close()
-    cnx.close()
+    database_disconect(cnx)
 
 
 def login(student_num):
-    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cnx = database_connector()
     cursor = cnx.cursor()
 
     query = "UPDATE `telegram_bot`.`students` SET login = 1 WHERE student_number = %d" % int(student_num)
@@ -94,11 +103,11 @@ def login(student_num):
     cnx.commit()
 
     cursor.close()
-    cnx.close()
+    database_disconect(cnx)
 
 
 def logout_db(user_id):
-    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cnx = database_connector()
     cursor = cnx.cursor()
 
     query = "UPDATE `telegram_bot`.`students` SET login = 0 WHERE id = %d" % user_id
@@ -107,11 +116,11 @@ def logout_db(user_id):
     cursor.execute(query)
     cnx.commit()
     cursor.close()
-    cnx.close()
+    database_disconect(cnx)
 
 
 def check_log(user_id):
-    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cnx = database_connector()
     cursor = cnx.cursor()
 
     check = False
@@ -124,12 +133,12 @@ def check_log(user_id):
             check = False
 
     cursor.close()
-    cnx.close()
+    database_disconect(cnx)
     return check
 
 
 def check_student_number(student_number):
-    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cnx = database_connector()
     cursor = cnx.cursor()
 
     check = False
@@ -142,12 +151,12 @@ def check_student_number(student_number):
                 check = True
 
     cursor.close()
-    cnx.close()
+    database_disconect(cnx)
     return check
 
 
 def check_student_data(student_num):
-    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cnx = database_connector()
     cursor = cnx.cursor()
 
     check = False
@@ -160,12 +169,12 @@ def check_student_data(student_num):
                 check = True
 
     cursor.close()
-    cnx.close()
+    database_disconect(cnx)
     return check
 
 
 def check_password_from_db(student_num, password):
-    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cnx = database_connector()
     cursor = cnx.cursor()
 
     check = False
@@ -179,12 +188,12 @@ def check_password_from_db(student_num, password):
                 check = True
 
     cursor.close()
-    cnx.close()
+    database_disconect(cnx)
     return check
 
 
 def check_telegram_id_exist(user_id):
-    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cnx = database_connector()
     cursor = cnx.cursor()
 
     check = False
@@ -197,7 +206,7 @@ def check_telegram_id_exist(user_id):
                 check = True
 
     cursor.close()
-    cnx.close()
+    database_disconect(cnx)
     return check
 
 
@@ -212,7 +221,7 @@ def add_student(user_id, user_data):
         sex = 'F'
 
     # add user to the database
-    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cnx = database_connector()
     cursor = cnx.cursor()
 
     update_student = ("UPDATE students"
@@ -229,4 +238,10 @@ def add_student(user_id, user_data):
     cnx.commit()
 
     cursor.close()
-    cnx.close()
+    database_disconect(cnx)
+
+
+#ADMINS
+
+
+
