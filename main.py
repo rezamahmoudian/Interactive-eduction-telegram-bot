@@ -2,7 +2,7 @@ from __future__ import print_function
 import logging
 import telegram
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
-from telegram.ext import (Updater, CommandHandler, MessageHandler, filters, ConversationHandler, ApplicationBuilder)
+from telegram.ext import (Updater, CommandHandler, MessageHandler, filters, ConversationHandler, ApplicationBuilder,InlineQueryHandler)
 import os
 import mysql.connector
 from mysql.connector import errorcode
@@ -61,7 +61,11 @@ def main():
             CREATECARDS: [CommandHandler('admin', admin),
                           MessageHandler(filters.Regex('^بله$'), add_cards_db),
                           MessageHandler(filters.Regex('^خیر'), create_card_cancel),
-                          ]
+                          ],
+            BROADCASTCARDS: [CommandHandler('admin', admin),
+                             MessageHandler(filters.Regex('^سرگروه ها$'), broadcast_leader_cards),
+                             MessageHandler(filters.Regex('^زیرگروه ها'), broadcast_cards),
+                             ]
         },
         fallbacks=[CommandHandler('cancle', cancle)]
     )

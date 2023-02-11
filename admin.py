@@ -9,8 +9,10 @@ admin_reply_keyboard = [['حذف موضوع', 'افزودن موضوع'],
                         ['بازگردانی کارتها', 'پخش کارتها', 'ایجاد کارتها'],
                         ['مشاهده ی اطلاعات کاربران']]
 confirm_keyboard = [['خیر', 'بله']]
+reply_keyboard_broadcast = [['زیرگروه ها', 'سرگروه ها']]
 admin_markup = ReplyKeyboardMarkup(admin_reply_keyboard, resize_keyboard=True, one_time_keyboard=True)
 confirm_markup = ReplyKeyboardMarkup(confirm_keyboard, resize_keyboard=True, one_time_keyboard=True)
+broadcast_markup = ReplyKeyboardMarkup(reply_keyboard_broadcast, resize_keyboard=True, one_time_keyboard=True)
 
 CHECKADMINPASS, CHOOSEACTION, ADDSUB, DELETESUB, SHOWSUBJECTS, DELETEALLSUBJECTS, CREATECARDS, BROADCASTCARDS, RETURNCARDS, SHOWUSERINFORMATION = range(
     10)
@@ -58,9 +60,10 @@ async def choose_action(update, context):
     elif text == 'حذف همه ی موضوعات':
         return DELETEALLSUBJECTS
     elif text == 'ایجاد کارتها':
-        await update.message.reply_text("آیا از مطمئن هستید؟", reply_markup=confirm_markup)
+        await update.message.reply_text("آیا از انجام این فرایند مطمئن هستید؟", reply_markup=confirm_markup)
         return CREATECARDS
     elif text == 'پخش کارتها':
+        await update.message.reply_text("قصد پخش کدام دسته از کارتها را دارید؟", reply_markup=broadcast_markup)
         return BROADCASTCARDS
     elif text == 'بازگردانی کارتهای پخش شده':
         return RETURNCARDS
@@ -337,7 +340,7 @@ def get_leader_description(student_num):
     return description
 
 
-async def broadcast_leader_cards():
+async def broadcast_leader_cards(update, context):
     leader_nums = get_leader_nums()
     for student_number in leader_nums:
         first_name = get_student_fname(student_number)
@@ -356,11 +359,106 @@ async def broadcast_leader_cards():
             await bot.send_message(chat_id=chat_id, text=text)
         except:
             print("chat with id %d not fount" % chat_id)
+    await update.message.reply_text("کارتهای سرگروه ها با موفقیت پخش شدند.", reply_markup=admin_markup)
+    return CHOOSEACTION
+
+def get_student_nums():
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+    query = "SELECT student_id FROM telegram_bot.cards1;"
+    cursor.execute(query)
+    student_nums = []
+    for data in cursor:
+        for student_num in data:
+            student_nums.append(student_num)
+    print(student_nums)
+    cursor.close()
+    cnx.close()
+    return student_nums
 
 
-def broadcast_cards():
-    pass
+def get_subject_id(student_num):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+    subject_id = 1
+    query = "SELECT subject_id FROM telegram_bot.cards1 WHERE student_id=%d;" % student_num
+    cursor.execute(query)
+    for data in cursor:
+        subject_id = data[0]
+    cursor.close()
+    cnx.close()
+    print(subject_id)
+    return subject_id
+
+
+def get_subject_title(subject_id):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+
+    subject_title = ''
+    query = "SELECT title FROM telegram_bot.cards WHERE id=%d;" % subject_id
+    cursor.execute(query)
+    for data in cursor:
+        subject_title = data[0]
+    cursor.close()
+    cnx.close()
+    print(subject_title)
+    return subject_title
+
+
+def get_subject_description(subject_id):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+
+    subject_description = ''
+    query = "SELECT description FROM telegram_bot.cards WHERE id=%d;" % subject_id
+    cursor.execute(query)
+    for data in cursor:
+        subject_description = data[0]
+    cursor.close()
+    cnx.close()
+    print(subject_description)
+    return subject_description
+
+
+def get_subject_topic(subject_id):
+    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cursor = cnx.cursor()
+
+    subject_topic = ''
+    query = "SELECT topic FROM telegram_bot.cards WHERE id=%d;" % subject_id
+    cursor.execute(query)
+    for data in cursor:
+        subject_topic = data[0]
+    cursor.close()
+    cnx.close()
+    print(subject_topic)
+    return subject_topic
+
+
+async def broadcast_cards(update, context):
+    student_nums = get_student_nums()
+    for student_number in student_nums:
+        subject_id = get_subject_id(student_number)
+        first_name = get_student_fname(student_number)
+        last_name = get_student_lname(student_number)
+        chat_id = get_student_chat_id(student_number)
+        topic = get_subject_topic(subject_id)
+        description = get_subject_description(subject_id)
+        title = get_subject_title(subject_id)
+
+        text = " \n سلام {fname} {lname} عزیز با شماره دانشجویی {student_num}" \
+               " \n.میباشد {title} موضوع شما در جلسه ی آینده " \
+               "\n{descrip} :توضیحات".format(fname=first_name, lname=last_name, student_num=student_number, title=title,
+                                             descrip=description)
+        print(text)
+        try:
+            await bot.send_message(chat_id=chat_id, text=text)
+        except:
+            print("chat with id %d not fount" % chat_id)
+    await update.message.reply_text("کارتها ها با موفقیت پخش شدند.", reply_markup=admin_markup)
+    return CHOOSEACTION
 
 
 if __name__ == '__main__':
-    broadcast_leader_cards()
+    get_subject_topic(6)
