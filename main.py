@@ -1,15 +1,8 @@
 from __future__ import print_function
-import logging
-import telegram
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
-from telegram.ext import (Updater, CommandHandler, MessageHandler, filters, ConversationHandler, ApplicationBuilder,InlineQueryHandler)
+from telegram.ext import (CommandHandler, MessageHandler, filters, ApplicationBuilder)
 import os
-import mysql.connector
-from mysql.connector import errorcode
-from database_modules import *
 from users import *
 from admin import *
-from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()

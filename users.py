@@ -27,9 +27,6 @@ async def start(update, context):
         await bot.send_message(chat_id=-1, text="text")
     except:
         print("chat with id %d not fount")
-    print(update.message)
-    print(text)
-
 
     if check_telegram_id_exist(user.id) and check_log(user.id):
         await update.message.reply_text("با موفقیت وارد شدید!")

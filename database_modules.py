@@ -1,15 +1,19 @@
 import mysql.connector
 from mysql.connector import errorcode
 import random
+import os
+from dotenv import load_dotenv
 
 
 def database_connector():
-    cnx = mysql.connector.connect(user='root', password='1234', database='telegram_bot')
+    cnx = mysql.connector.connect(user=os.getenv('DATABASE_USER'), password=os.getenv('DATABASE_PASS'),
+                                  database='telegram_bot')
     return cnx
 
 
 def database_disconect(cnx):
     cnx.close()
+
 
 # USERS
 def create_database():
@@ -99,7 +103,6 @@ def login(student_num):
     cursor = cnx.cursor()
 
     query = "UPDATE `telegram_bot`.`students` SET login = 1 WHERE student_number = %d" % int(student_num)
-    print(query)
     cursor.execute(query)
     cnx.commit()
 
@@ -112,7 +115,6 @@ def logout_db(user_id):
     cursor = cnx.cursor()
 
     query = "UPDATE `telegram_bot`.`students` SET login = 0 WHERE id = %d" % user_id
-    print(query)
 
     cursor.execute(query)
     cnx.commit()
@@ -147,7 +149,6 @@ def check_student_number(student_number):
     cursor.execute(query)
     for data in cursor:
         for student_num in data:
-            print(student_num)
             if student_num == student_number:
                 check = True
 
@@ -165,7 +166,6 @@ def check_student_data(student_num):
     cursor.execute(query)
     for data in cursor:
         for id in data:
-            print(id)
             if id != -1:
                 check = True
 
@@ -180,11 +180,9 @@ def check_password_from_db(student_num, password):
 
     check = False
     query = ("SELECT password FROM students WHERE student_number = {}".format(student_num))
-    print(query)
     cursor.execute(query)
     for data in cursor:
         for p in data:
-            print(id)
             if p == password:
                 check = True
 
@@ -202,7 +200,6 @@ def check_telegram_id_exist(user_id):
     cursor.execute(query)
     for data in cursor:
         for id in data:
-            print(id)
             if id == user_id:
                 check = True
 
@@ -215,7 +212,6 @@ def add_student(user_id, user_data):
     items = []
     for key, value in user_data.items():
         items.append(value)
-    print(items)
     if items[3] == 'مرد':
         sex = 'M'
     elif items[3] == 'زن':
@@ -228,13 +224,11 @@ def add_student(user_id, user_data):
     update_student = ("UPDATE students"
                       " SET id = %s, first_name = %s, last_name = %s, sex = %s, password = %s"
                       "WHERE student_number = %s")
-    print(update_student)
     # add_student = ("INSERT INTO students "
     #                "(id, student_number, first_name, last_name, sex)"
     #                "VALUES (%s, %s, %s, %s, %s)")
 
     data_student = (user_id, items[1], items[2], sex, items[4], items[0])
-    print("262_ ", data_student)
     cursor.execute(update_student, data_student)
     cnx.commit()
 
@@ -242,7 +236,7 @@ def add_student(user_id, user_data):
     database_disconect(cnx)
 
 
-#ADMINS
+# ADMINS
 
 def get_man_students():
     man = []
@@ -282,11 +276,9 @@ def create_leader_cards(man, female):
     query_cards = "SELECT * FROM telegram_bot.cards;"
     cursor.execute(query_cards)
     for data in cursor:
-        print(data)
         topics.append(data[4])
 
     topics = list(dict.fromkeys(topics))
-    print(topics)
     cursor.close()
     database_disconect(cnx)
     leader_cards = []
@@ -297,9 +289,6 @@ def create_leader_cards(man, female):
             card.append(man[0])
             man.pop(0)
             leader_cards.append(card)
-    print("cards: ")
-    print(leader_cards)
-    print(man)
     return leader_cards
 
 
@@ -312,8 +301,6 @@ def create_cards():
 
     random.shuffle(man)
     random.shuffle(female)
-    print(man)
-    print(female)
 
     leader_cards = create_leader_cards(man, female)
     add_leader_cards_db(leader_cards)
@@ -322,10 +309,8 @@ def create_cards():
     query_cards = "SELECT * FROM telegram_bot.cards;"
     cursor.execute(query_cards)
     for data in cursor:
-        print(data)
         subjects.append(data[0])
 
-    print(subjects)
     cursor.close()
     database_disconect(cnx)
 
@@ -381,7 +366,6 @@ def add_leader_cards_db(leader_cards):
     for data in leader_cards:
         add_card = "INSERT INTO `telegram_bot`.`leader_cards`(`student_id`,`topic`,`description`) VALUES" \
                    " ( {student_id} , '{topic}' , 'description');".format(student_id=data[1], topic=str(data[0]))
-        print(add_card)
         cursor.execute(add_card)
         cursor = cnx.cursor()
 
@@ -418,7 +402,6 @@ def get_student_chat_id(student_num):
         student_chat_id = data[0]
     cursor.close()
     database_disconect(cnx)
-    print(student_chat_id)
     return student_chat_id
 
 
@@ -432,7 +415,6 @@ def get_student_fname(student_num):
         first_name = data[0]
     cursor.close()
     database_disconect(cnx)
-    print(first_name)
     return first_name
 
 
@@ -446,7 +428,6 @@ def get_student_lname(student_num):
         last_name = data[0]
     cursor.close()
     database_disconect(cnx)
-    print(last_name)
     return last_name
 
 
@@ -460,7 +441,6 @@ def get_leader_topic(student_num):
         topic = data[0]
     cursor.close()
     database_disconect(cnx)
-    print(topic)
     return topic
 
 
@@ -474,8 +454,8 @@ def get_leader_description(student_num):
         description = data[0]
     cursor.close()
     database_disconect(cnx)
-    print(description)
     return description
+
 
 def get_student_nums():
     cnx = database_connector()
@@ -486,7 +466,6 @@ def get_student_nums():
     for data in cursor:
         for student_num in data:
             student_nums.append(student_num)
-    print(student_nums)
     cursor.close()
     database_disconect(cnx)
     return student_nums
@@ -502,7 +481,6 @@ def get_subject_id(student_num):
         subject_id = data[0]
     cursor.close()
     database_disconect(cnx)
-    print(subject_id)
     return subject_id
 
 
@@ -517,7 +495,6 @@ def get_subject_title(subject_id):
         subject_title = data[0]
     cursor.close()
     database_disconect(cnx)
-    print(subject_title)
     return subject_title
 
 
@@ -532,7 +509,6 @@ def get_subject_description(subject_id):
         subject_description = data[0]
     cursor.close()
     database_disconect(cnx)
-    print(subject_description)
     return subject_description
 
 
@@ -547,10 +523,4 @@ def get_subject_topic(subject_id):
         subject_topic = data[0]
     cursor.close()
     database_disconect(cnx)
-    print(subject_topic)
     return subject_topic
-
-
-
-
-
