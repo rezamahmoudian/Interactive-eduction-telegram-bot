@@ -10,8 +10,11 @@ from database_modules import *
 from users import *
 from admin import *
 from datetime import datetime
+from dotenv import load_dotenv
 
-TOKEN = "5806507050:AAFVm2zmYpAxDwjQtXr_MaROnYM_eZG8gwI"
+load_dotenv()
+TOKEN = os.getenv('TELEGRAM_TOKEN')
+
 bot = telegram.Bot(token=TOKEN)
 
 PORT = int(os.environ.get('PORT', 5000))
@@ -22,7 +25,7 @@ def error(update, context):
 
 
 def main():
-    app = ApplicationBuilder().token("5806507050:AAFVm2zmYpAxDwjQtXr_MaROnYM_eZG8gwI").build()
+    app = ApplicationBuilder().token(TOKEN).build()
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start), CommandHandler('login', start)],
@@ -70,8 +73,6 @@ def main():
         fallbacks=[CommandHandler('cancle', cancle)]
     )
 
-    # telegram.Message(message_id=1, text="hiiiii",chat=telegram.Chat(id=1497452845, type="PRIVATE") , migrate_to_chat_id=1497452845, date=datetime.now())
-    # telegram.Bot.send_message()
     app.add_handler(conv_handler)
     app.add_handler(admin_conv_handler)
     app.add_handler(CommandHandler('logout', logout))
