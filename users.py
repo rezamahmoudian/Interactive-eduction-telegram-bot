@@ -159,7 +159,7 @@ async def check_password(update, context):
     student_num = user_data['شماره دانشجویی']
     print("student num for check password: " + str(student_num))
 
-    check = check_password_from_db(student_num, text)
+    check = check_password_from_db(int(student_num), text)
     logger.info("password of %s: %s checked", user.first_name, update.message.text)
     if check:
         await update.message.reply_text("با موفقیت وارد شدید.")
