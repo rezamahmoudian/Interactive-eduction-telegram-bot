@@ -84,7 +84,7 @@ async def add_cards_db(update, context):
     cursor.execute(delete_leader_cards)
 
     cursor = cnx.cursor()
-    delete_cards = "DELETE FROM cards1 WHERE id != 0;"
+    delete_cards = "DELETE FROM cards WHERE id != 0;"
     cursor.execute(delete_cards)
     cnx.commit()
     cursor.close()
@@ -92,7 +92,7 @@ async def add_cards_db(update, context):
     cursor = cnx.cursor()
     for data in cards:
         for i in range(len(data) - 1):
-            add_card = "INSERT INTO `telegram_bot`.`cards1`(`student_id`,`subject_id`) VALUES " \
+            add_card = "INSERT INTO `telegram_bot`.`cards`(`student_id`,`subject_id`) VALUES " \
                        "({student_id},{subject_id})".format(student_id=data[i + 1], subject_id=data[0])
             print(add_card)
             cursor.execute(add_card)
@@ -128,6 +128,7 @@ async def broadcast_leader_cards(update, context):
 
 
 async def broadcast_cards(update, context):
+
     student_nums = get_student_nums()
     for student_number in student_nums:
         subject_id = get_subject_id(student_number)

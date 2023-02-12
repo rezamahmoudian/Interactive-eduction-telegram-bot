@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 
 def database_connector():
-    cnx = mysql.connector.connect(user=os.getenv('DATABASE_USER'), password=os.getenv('DATABASE_PASS'),
+    cnx = mysql.connector.connect(host=os.getenv('DB_HOST'), user=os.getenv('DATABASE_USER'), password=os.getenv('DATABASE_PASS'),
                                   database='telegram_bot')
     return cnx
 
@@ -17,7 +17,7 @@ def database_disconect(cnx):
 
 # USERS
 def create_database():
-    DB_NAME = 'telegram_bot'
+    DB_NAME = os.getenv('DB_NAME')
     TABLES = {}
     TABLES['students'] = (
         "CREATE TABLE `students` ("
@@ -31,8 +31,8 @@ def create_database():
         "  PRIMARY KEY (`id`)"
         ") ENGINE=InnoDB")
 
-    TABLES['cards'] = (
-        "CREATE TABLE `cards` ("
+    TABLES['subjects'] = (
+        "CREATE TABLE `subjects` ("
         "  `id` int(11) NOT NULL,"
         "  `week` int(8) NOT NULL,"
         "  `title` varchar(200) NOT NULL,"
@@ -41,14 +41,14 @@ def create_database():
         "  PRIMARY KEY (`id`)"
         ") ENGINE=InnoDB")
 
-    TABLES['cards1'] = (
-        "CREATE TABLE `cards1` ("
+    TABLES['cards'] = (
+        "CREATE TABLE `cards` ("
         "  `id` int(11) NOT NULL AUTO_INCREMENT,"
         "  `student_id` int(8) NOT NULL,"
         "  `subject_id` int(8) NOT NULL,"
         "  PRIMARY KEY (`id`),"
         "   FOREIGN KEY (student_id) REFERENCES students(student_number),"
-        "   FOREIGN KEY (subject_id) REFERENCES cards(id)"
+        "   FOREIGN KEY (subject_id) REFERENCES subjects(id)"
         ") ENGINE=InnoDB")
 
     TABLES['leader_cards'] = (
@@ -273,7 +273,7 @@ def create_leader_cards(man, female):
     cursor = cnx.cursor()
 
     topics = []
-    query_cards = "SELECT * FROM telegram_bot.cards;"
+    query_cards = "SELECT * FROM telegram_bot.subjects;"
     cursor.execute(query_cards)
     for data in cursor:
         topics.append(data[4])
@@ -306,7 +306,7 @@ def create_cards():
     add_leader_cards_db(leader_cards)
 
     subjects = []
-    query_cards = "SELECT * FROM telegram_bot.cards;"
+    query_cards = "SELECT * FROM telegram_bot.subjects;"
     cursor.execute(query_cards)
     for data in cursor:
         subjects.append(data[0])
@@ -460,7 +460,7 @@ def get_leader_description(student_num):
 def get_student_nums():
     cnx = database_connector()
     cursor = cnx.cursor()
-    query = "SELECT student_id FROM telegram_bot.cards1;"
+    query = "SELECT student_id FROM telegram_bot.cards;"
     cursor.execute(query)
     student_nums = []
     for data in cursor:
@@ -475,7 +475,7 @@ def get_subject_id(student_num):
     cnx = database_connector()
     cursor = cnx.cursor()
     subject_id = 1
-    query = "SELECT subject_id FROM telegram_bot.cards1 WHERE student_id=%d;" % student_num
+    query = "SELECT subject_id FROM telegram_bot.cards WHERE student_id=%d;" % student_num
     cursor.execute(query)
     for data in cursor:
         subject_id = data[0]
@@ -489,7 +489,7 @@ def get_subject_title(subject_id):
     cursor = cnx.cursor()
 
     subject_title = ''
-    query = "SELECT title FROM telegram_bot.cards WHERE id=%d;" % subject_id
+    query = "SELECT title FROM telegram_bot.subjects WHERE id=%d;" % subject_id
     cursor.execute(query)
     for data in cursor:
         subject_title = data[0]
@@ -503,7 +503,7 @@ def get_subject_description(subject_id):
     cursor = cnx.cursor()
 
     subject_description = ''
-    query = "SELECT description FROM telegram_bot.cards WHERE id=%d;" % subject_id
+    query = "SELECT description FROM telegram_bot.subjects WHERE id=%d;" % subject_id
     cursor.execute(query)
     for data in cursor:
         subject_description = data[0]
@@ -517,7 +517,7 @@ def get_subject_topic(subject_id):
     cursor = cnx.cursor()
 
     subject_topic = ''
-    query = "SELECT topic FROM telegram_bot.cards WHERE id=%d;" % subject_id
+    query = "SELECT topic FROM telegram_bot.subjects WHERE id=%d;" % subject_id
     cursor.execute(query)
     for data in cursor:
         subject_topic = data[0]
