@@ -92,7 +92,7 @@ async def add_cards_db(update, context):
     cursor = cnx.cursor()
     for data in cards:
         for i in range(len(data) - 1):
-            add_card = "INSERT INTO `telegram_bot`.`cards`(`student_id`,`subject_id`) VALUES " \
+            add_card = "INSERT INTO `cards`(`student_id`,`subject_id`) VALUES " \
                        "({student_id},{subject_id})".format(student_id=data[i + 1], subject_id=data[0])
             print(add_card)
             cursor.execute(add_card)

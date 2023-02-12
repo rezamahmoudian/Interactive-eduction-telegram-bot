@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 def database_connector():
     cnx = mysql.connector.connect(host=os.getenv('DB_HOST'), user=os.getenv('DATABASE_USER'), password=os.getenv('DATABASE_PASS'),
-                                  database='telegram_bot')
+                                  database=os.getenv('DB_NAME'))
     return cnx
 
 
@@ -243,7 +243,7 @@ def get_man_students():
     cnx = database_connector()
     cursor = cnx.cursor()
 
-    queryM = "SELECT * FROM telegram_bot.students WHERE sex = 'M' and login = 1"
+    queryM = "SELECT * FROM students WHERE sex = 'M' and login = 1"
     cursor.execute(queryM)
     for data in cursor:
         man.append(data[1])
@@ -257,7 +257,7 @@ def get_female_students():
     cnx = database_connector()
     cursor = cnx.cursor()
 
-    queryF = "SELECT * FROM telegram_bot.students WHERE sex = 'F' and login = 1"
+    queryF = "SELECT * FROM students WHERE sex = 'F' and login = 1"
 
     cursor.execute(queryF)
     for data in cursor:
@@ -273,7 +273,7 @@ def create_leader_cards(man, female):
     cursor = cnx.cursor()
 
     topics = []
-    query_cards = "SELECT * FROM telegram_bot.subjects;"
+    query_cards = "SELECT * FROM subjects;"
     cursor.execute(query_cards)
     for data in cursor:
         topics.append(data[4])
@@ -306,7 +306,7 @@ def create_cards():
     add_leader_cards_db(leader_cards)
 
     subjects = []
-    query_cards = "SELECT * FROM telegram_bot.subjects;"
+    query_cards = "SELECT * FROM subjects;"
     cursor.execute(query_cards)
     for data in cursor:
         subjects.append(data[0])
@@ -364,7 +364,7 @@ def add_leader_cards_db(leader_cards):
     cnx = database_connector()
     cursor = cnx.cursor()
     for data in leader_cards:
-        add_card = "INSERT INTO `telegram_bot`.`leader_cards`(`student_id`,`topic`,`description`) VALUES" \
+        add_card = "INSERT INTO leader_cards (`student_id`,`topic`,`description`) VALUES" \
                    " ( {student_id} , '{topic}' , 'description');".format(student_id=data[1], topic=str(data[0]))
         cursor.execute(add_card)
         cursor = cnx.cursor()
@@ -380,7 +380,7 @@ def get_leader_nums():
     cursor = cnx.cursor()
     # get_leader_topic(9901123)
     # get_leader_description(9901119)
-    query = "SELECT student_id FROM telegram_bot.leader_cards;"
+    query = "SELECT student_id FROM leader_cards;"
     cursor.execute(query)
     leader_nums = []
     for data in cursor:
@@ -396,7 +396,7 @@ def get_student_chat_id(student_num):
     cnx = database_connector()
     cursor = cnx.cursor()
     student_chat_id = 1
-    query = "SELECT id FROM telegram_bot.students WHERE student_number=%d;" % student_num
+    query = "SELECT id FROM students WHERE student_number=%d;" % student_num
     cursor.execute(query)
     for data in cursor:
         student_chat_id = data[0]
@@ -409,7 +409,7 @@ def get_student_fname(student_num):
     cnx = database_connector()
     cursor = cnx.cursor()
     first_name = ''
-    query = "SELECT first_name FROM telegram_bot.students WHERE student_number=%d;" % student_num
+    query = "SELECT first_name FROM students WHERE student_number=%d;" % student_num
     cursor.execute(query)
     for data in cursor:
         first_name = data[0]
@@ -422,7 +422,7 @@ def get_student_lname(student_num):
     cnx = database_connector()
     cursor = cnx.cursor()
     last_name = ''
-    query = "SELECT last_name FROM telegram_bot.students WHERE student_number=%d;" % student_num
+    query = "SELECT last_name FROM students WHERE student_number=%d;" % student_num
     cursor.execute(query)
     for data in cursor:
         last_name = data[0]
@@ -435,7 +435,7 @@ def get_leader_topic(student_num):
     cnx = database_connector()
     cursor = cnx.cursor()
     topic = ''
-    query = "SELECT topic FROM telegram_bot.leader_cards WHERE student_id=%d;" % student_num
+    query = "SELECT topic FROM leader_cards WHERE student_id=%d;" % student_num
     cursor.execute(query)
     for data in cursor:
         topic = data[0]
@@ -448,7 +448,7 @@ def get_leader_description(student_num):
     cnx = database_connector()
     cursor = cnx.cursor()
     description = ''
-    query = "SELECT description FROM telegram_bot.leader_cards WHERE student_id=%d;" % student_num
+    query = "SELECT description FROM leader_cards WHERE student_id=%d;" % student_num
     cursor.execute(query)
     for data in cursor:
         description = data[0]
@@ -460,7 +460,7 @@ def get_leader_description(student_num):
 def get_student_nums():
     cnx = database_connector()
     cursor = cnx.cursor()
-    query = "SELECT student_id FROM telegram_bot.cards;"
+    query = "SELECT student_id FROM cards;"
     cursor.execute(query)
     student_nums = []
     for data in cursor:
@@ -475,7 +475,7 @@ def get_subject_id(student_num):
     cnx = database_connector()
     cursor = cnx.cursor()
     subject_id = 1
-    query = "SELECT subject_id FROM telegram_bot.cards WHERE student_id=%d;" % student_num
+    query = "SELECT subject_id FROM cards WHERE student_id=%d;" % student_num
     cursor.execute(query)
     for data in cursor:
         subject_id = data[0]
@@ -489,7 +489,7 @@ def get_subject_title(subject_id):
     cursor = cnx.cursor()
 
     subject_title = ''
-    query = "SELECT title FROM telegram_bot.subjects WHERE id=%d;" % subject_id
+    query = "SELECT title FROM subjects WHERE id=%d;" % subject_id
     cursor.execute(query)
     for data in cursor:
         subject_title = data[0]
@@ -503,7 +503,7 @@ def get_subject_description(subject_id):
     cursor = cnx.cursor()
 
     subject_description = ''
-    query = "SELECT description FROM telegram_bot.subjects WHERE id=%d;" % subject_id
+    query = "SELECT description FROM subjects WHERE id=%d;" % subject_id
     cursor.execute(query)
     for data in cursor:
         subject_description = data[0]
@@ -517,7 +517,7 @@ def get_subject_topic(subject_id):
     cursor = cnx.cursor()
 
     subject_topic = ''
-    query = "SELECT topic FROM telegram_bot.subjects WHERE id=%d;" % subject_id
+    query = "SELECT topic FROM subjects WHERE id=%d;" % subject_id
     cursor.execute(query)
     for data in cursor:
         subject_topic = data[0]
