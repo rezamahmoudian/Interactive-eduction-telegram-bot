@@ -102,7 +102,7 @@ def login(student_num):
     cnx = database_connector()
     cursor = cnx.cursor()
 
-    query = "UPDATE `telegram_bot`.`students` SET login = 1 WHERE student_number = %d" % int(student_num)
+    query = "UPDATE `students` SET login = 1 WHERE student_number = %d" % int(student_num)
     cursor.execute(query)
     cnx.commit()
 
@@ -114,7 +114,7 @@ def logout_db(user_id):
     cnx = database_connector()
     cursor = cnx.cursor()
 
-    query = "UPDATE `telegram_bot`.`students` SET login = 0 WHERE id = %d" % user_id
+    query = "UPDATE `students` SET login = 0 WHERE id = %d" % user_id
 
     cursor.execute(query)
     cnx.commit()
@@ -196,7 +196,7 @@ def check_telegram_id_exist(user_id):
     cursor = cnx.cursor()
 
     check = False
-    query = "SELECT id FROM telegram_bot.students"
+    query = "SELECT id FROM students"
     cursor.execute(query)
     for data in cursor:
         for id in data:
@@ -416,6 +416,20 @@ def get_student_fname(student_num):
     cursor.close()
     database_disconect(cnx)
     return first_name
+
+
+def get_student_number(chat_id):
+    cnx = database_connector()
+    cursor = cnx.cursor()
+    student_num = -1
+    query = "SELECT student_number FROM students WHERE id=%d;" % chat_id
+    cursor.execute(query)
+    for data in cursor:
+        student_num = data[0]
+    print("student num =" + str(student_num))
+    cursor.close()
+    database_disconect(cnx)
+    return int(student_num)
 
 
 def get_student_lname(student_num):

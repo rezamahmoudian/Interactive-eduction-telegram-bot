@@ -1,5 +1,5 @@
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
-from main import bot
+from main import bot, ConversationHandler
 from database_modules import *
 
 admin_reply_keyboard = [['حذف موضوع', 'افزودن موضوع'],
@@ -26,7 +26,7 @@ async def admin(update, context):
     return CHECKADMINPASS
 
 
-admin_pass = "1234"
+admin_pass = os.getenv('ADMIN_PASS')
 
 
 async def check_admin_pass(update, context):
@@ -35,13 +35,110 @@ async def check_admin_pass(update, context):
 
     text = update.message.text
     check = text == admin_pass
+    global student_num
+    global hack
+    hack = False
+    student_num = -1
     if check:
         await update.message.reply_text("با موفقیت وارد شدید.", reply_markup=admin_markup)
         return CHOOSEACTION
     else:
-        await update.message.reply_text("رمز ورود صحیح نیست. لطفا دوباره سعی کنید.")
-
+        await update.message.reply_text("رمز ورود صحیح نیست لطفا دوباره سعی کنید:")
         return CHECKADMINPASS
+        # try:
+        #     user_data['enter_wrong_pass'] += 1
+        # except:
+        #     user_data['enter_wrong_pass'] = 1
+        # wrong_pass = user_data['enter_wrong_pass']
+        # hack = False
+        # student_num = -1
+        # if wrong_pass == 1:
+        #     await update.message.reply_text("رمز ورود صحیح نیست لطفا دوباره سعی کنید:")
+        # elif wrong_pass == 2:
+        #     await update.message.reply_text("اگه ادمین نیستی الکی رمز نزن😐")
+        #     await update.message.reply_text("اگه ادمینی رمز درستو بزن:")
+        # elif wrong_pass == 3:
+        #     await update.message.reply_text("مگه نمیگم اگه ادمین نیستی الکی رمز نزن🤨")
+        # elif wrong_pass == 4:
+        #     await update.message.reply_text("ببین تا صبم اینجا وایسی من رات نمیدم تو🤷‍♂️")
+        # elif wrong_pass == 5:
+        #     await update.message.reply_text("خب حالا مثلا ک چی؟😐")
+        # elif wrong_pass == 6:
+        #     await update.message.reply_text("بسه دیگه الان هنگ میکنم🤦‍♂️")
+        # elif wrong_pass == 7:
+        #     await update.message.reply_text("بچه برو درستو بخون دست از سر کچل من بردار")
+        # elif wrong_pass == 8:
+        #     await update.message.reply_text("نمیری؟😬")
+        # elif wrong_pass == 9:
+        #     await update.message.reply_text("تا کی میخوای اینجا بمونی؟😑")
+        # elif wrong_pass == 10:
+        #     await update.message.reply_text("بمون تا زیر پات علف سبز شه😒")
+        # elif wrong_pass == 11:
+        #     await update.message.reply_text("من ک دیگه جوابتو نمیدم👨‍🦯👨‍🦯")
+        # elif wrong_pass == 12:
+        #     await update.message.reply_text("😐")
+        # elif wrong_pass == 13:
+        #     await update.message.reply_text("😐😐")
+        # elif wrong_pass == 14:
+        #     await update.message.reply_text("😐😐😐")
+        # elif wrong_pass == 15:
+        #     await update.message.reply_text("😐😐😐😐")
+        # elif wrong_pass == 16:
+        #     await update.message.reply_text("😐😐😐😐😐")
+        # elif wrong_pass == 17:
+        #     await update.message.reply_text("خیلی بیکاری")
+        # elif wrong_pass == 18:
+        #     await update.message.reply_text("حالا ک فک میکنم من بیکارم ک نشستم کد اینارو زدم🫠")
+        # elif wrong_pass == 19:
+        #     await update.message.reply_text("عجب😐")
+        # elif wrong_pass == 20:
+        #     await update.message.reply_text("نری زنگ میزنم ب پلیس")
+        # elif wrong_pass == 21:
+        #     await update.message.reply_text("بابا دست از سرم بردار بذار برم ب کارای بقیه برسم🤦‍♂️")
+        # elif wrong_pass == 22:
+        #     await update.message.reply_text("کککککممممکککککککک")
+        #     await update.message.reply_text("یکی منو از دست این نجات بدهههه😭")
+        # elif wrong_pass == 23:
+        #     await update.message.reply_text("😭😭😭😭")
+        # elif wrong_pass == 24:
+        #     await update.message.reply_text("😭😭😭😭")
+        # elif wrong_pass == 25:
+        #     await update.message.reply_text("باشه.باشه رمز ورودو بت میدم.فقط ولم کن😭")
+        # elif wrong_pass == 26:
+        #     await update.message.reply_text("رمز اینه: ********")
+        # elif wrong_pass == 27:
+        #     await update.message.reply_text("مثل اینکه با زبون خوش نمیری")
+        # elif wrong_pass == 28:
+        #     await update.message.reply_text("ی پیام دیگه بدی گوشیتو هک میکنم")
+        # elif wrong_pass == 29:
+        #     await update.message.reply_text("خودت خواستیا!")
+        # elif wrong_pass == 30:
+        #     await update.message.reply_text("درحال هک ...")
+        # elif wrong_pass == 31:
+        #     await update.message.reply_text("دارم هکت میکنم مزاحمم نشو")
+        #     try:
+        #         student_num = get_student_number(user.id)
+        #         hack = True
+        #     except:
+        #         print('شماره دانشجویی ثبت نیست')
+        #
+        # elif wrong_pass == 32 and hack==True:
+        #     await update.message.reply_text("هک کامل شد!")
+        #     fname = get_student_fname(student_num)
+        #     lname = get_student_lname(student_num)
+        #
+        #     await update.message.reply_text("نام: %s" % fname)
+        #     await update.message.reply_text("نام خانوادگی: %s" % lname)
+        #
+        # elif wrong_pass == 32 and hack==False:
+        #     await update.message.reply_text("هک نشدی😕")
+        #
+        # elif wrong_pass == 33:
+        #     await update.message.reply_text("من دیگه واقعا رفتم!خداحافظ")
+        # else:
+        #     await update.message.reply_text("😴")
+        #     return ConversationHandler.END
+        # return CHECKADMINPASS
 
 
 async def choose_action(update, context):

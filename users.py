@@ -49,8 +49,7 @@ async def student_number(update, context):
 
     if check_student_number(int(text)):
         if check_student_data(int(text)):
-            # await update.message.reply_text("ایول اطلاعاتت رو هم ک قبلا ثبت کردی.")
-            await update.message.reply_text("برای ورود رمز ورود رو بنویس")
+            await update.message.reply_text("برای ورود رمز ورود را بنویسید")
             return CHECKPASSWORD
         else:
             await update.message.reply_text("شماره دانشجویی شما ثبت شده است.")
@@ -60,8 +59,8 @@ async def student_number(update, context):
             return FNAME
     else:
         await update.message.reply_text("شماره دانشجویی شما در کلاس ثبت نیست.")
-        await update.message.reply_text("لطفا شماره دانشجویی صحیح را وارد کنید.")
         await update.message.reply_text("اگر از دانشجویان کلاس هستید این موصوع را با ta در میان بگذارید.")
+        await update.message.reply_text("و یا شماره دانشجویی صحیح را وارد کنید:")
         return STUDENT_NUMBER
 
 
@@ -120,7 +119,7 @@ async def sex(update, context):
 
     logger.info("sex of %s: %s", user.first_name, update.message.text)
 
-    await update.message.reply_text("بسیار عالی؛ حالا ی پسوورد برای اکانتت انتخاب کن.")
+    await update.message.reply_text("لطفا برای اکانت خود یک پسوورد انتخاب کنید:")
 
     return PASSWORD
 
@@ -173,7 +172,7 @@ async def confirmation(update, context):
     add_student(user.id, user_data)
 
     await update.message.reply_text("اطلاعات شما ثبت شد!", reply_markup=ReplyKeyboardRemove())
-    await update.message.reply_text("برای ورود شماره دانشجوییت رو وارد کن!")
+    await update.message.reply_text("برای ورود شماره دانشجویی خود را وارد کنید:")
 
     return STUDENT_NUMBER
 
@@ -182,6 +181,6 @@ async def cancle(update, context):
     user = update.message.from_user
     logger.info("User %s canceled the coneversation", user.first_name)
 
-    await update.message.reply_text("بدرود امیدوارم بازم شما رو ببینم", reply_markup=ReplyKeyboardRemove())
+    await update.message.reply_text("بدرود", reply_markup=ReplyKeyboardRemove())
 
     return ConversationHandler.END
