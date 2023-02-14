@@ -13,9 +13,6 @@ bot = telegram.Bot(token=TOKEN)
 PORT = int(os.environ.get('PORT', 5000))
 
 
-def error(update, context):
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
-
 async def help(update, context):
     user = update.message.from_user
     user_data = context.user_data
@@ -29,6 +26,11 @@ async def help(update, context):
                                     "با دستور /logout از حساب کاربری خود خارج میشوید.\n"
                                     "دستور /admin برای ورود ب ربات به عنوان مدیر است.\n")
 
+
+def error(update, context):
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
+
+
 def main():
     app = ApplicationBuilder().token(TOKEN).build()
 
@@ -36,7 +38,8 @@ def main():
         entry_points=[CommandHandler('start', start), CommandHandler('login', start)],
 
         states={
-            STUDENT_NUMBER: [CommandHandler('start', start), CommandHandler('login', start), CommandHandler('cancle', cancle),
+            STUDENT_NUMBER: [CommandHandler('start', start), CommandHandler('login', start),
+                             CommandHandler('cancle', cancle),
                              MessageHandler(filters.TEXT, student_number)],
             FNAME: [CommandHandler('start', start), CommandHandler('login', start), CommandHandler('cancle', cancle),
                     MessageHandler(filters.TEXT, fname)],
@@ -46,9 +49,11 @@ def main():
                   MessageHandler(filters.TEXT, sex)],
             PASSWORD: [CommandHandler('start', start), CommandHandler('login', start), CommandHandler('cancle', cancle),
                        MessageHandler(filters.TEXT, password)],
-            CHECKPASSWORD: [CommandHandler('start', start), CommandHandler('login', start), CommandHandler('cancle', cancle),
+            CHECKPASSWORD: [CommandHandler('start', start), CommandHandler('login', start),
+                            CommandHandler('cancle', cancle),
                             MessageHandler(filters.TEXT, check_password)],
-            CONFIRMATION: [CommandHandler('start', start), CommandHandler('login', start), CommandHandler('cancle', cancle),
+            CONFIRMATION: [CommandHandler('start', start), CommandHandler('login', start),
+                           CommandHandler('cancle', cancle),
                            MessageHandler(filters.Regex('^مورد تایید است$'), confirmation),
                            MessageHandler(filters.Regex('^شروع دوباره$'), start)],
         },
@@ -58,20 +63,20 @@ def main():
     admin_conv_handler = ConversationHandler(
         entry_points=[CommandHandler('admin', admin)],
         states={
-            CHECKADMINPASS: [CommandHandler('admin', admin),CommandHandler('cancle', cancle),
+            CHECKADMINPASS: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
                              MessageHandler(filters.TEXT, check_admin_pass)],
             # CHOOSEACTION: [CommandHandler('admin', admin),
             #                MessageHandler(filters.Regex('^ایجاد کارتها$'), add_cards_db),
             #                MessageHandler(filters.Regex('^پخش کارتها$'), broadcast_cards),
             #                ]
-            CHOOSEACTION: [CommandHandler('admin', admin),CommandHandler('cancle', cancle),
+            CHOOSEACTION: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
                            MessageHandler(filters.TEXT, choose_action),
                            ],
-            CREATECARDS: [CommandHandler('admin', admin),CommandHandler('cancle', cancle),
+            CREATECARDS: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
                           MessageHandler(filters.Regex('^بله$'), add_cards_db),
                           MessageHandler(filters.Regex('^خیر'), create_card_cancel),
                           ],
-            BROADCASTCARDS: [CommandHandler('admin', admin),CommandHandler('cancle', cancle),
+            BROADCASTCARDS: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
                              MessageHandler(filters.Regex('^سرگروه ها$'), broadcast_leader_cards),
                              MessageHandler(filters.Regex('^زیرگروه ها'), broadcast_cards),
                              ]
