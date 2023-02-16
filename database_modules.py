@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 
 def database_connector():
-    cnx = mysql.connector.connect(host=os.getenv('DB_HOST'), user=os.getenv('DATABASE_USER'), password=os.getenv('DATABASE_PASS'),
+    cnx = mysql.connector.connect(host=os.getenv('DB_HOST'), port=os.getenv('DB_PORT'), user=os.getenv('DATABASE_USER'), password=os.getenv('DATABASE_PASS'),
                                   database=os.getenv('DB_NAME'))
     return cnx
 
