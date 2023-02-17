@@ -560,3 +560,6 @@ def delete_student_with_admin(student_num):
     cursor.close()
     cnx.commit()
     database_disconect(cnx)
+
+
+
