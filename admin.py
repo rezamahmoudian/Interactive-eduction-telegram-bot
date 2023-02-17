@@ -14,12 +14,15 @@ admin_reply_keyboard = [['حذف موضوع', 'افزودن موضوع'],
                         ['مشاهده ی اطلاعات دانشجویان']]
 confirm_keyboard = [['خیر', 'بله']]
 reply_keyboard_broadcast = [['زیرگروه ها', 'سرگروه ها']]
+reply_keyboard_student_info = [['مشاهده ی اطلاعات یک دانشجو'],
+                               ['مشاهده ی اطلاعات همه ی دانشجویان کلاس']]
 admin_markup = ReplyKeyboardMarkup(admin_reply_keyboard, resize_keyboard=True, one_time_keyboard=True)
 confirm_markup = ReplyKeyboardMarkup(confirm_keyboard, resize_keyboard=True, one_time_keyboard=True)
 broadcast_markup = ReplyKeyboardMarkup(reply_keyboard_broadcast, resize_keyboard=True, one_time_keyboard=True)
+student_info_markup = ReplyKeyboardMarkup(reply_keyboard_student_info, resize_keyboard=True, one_time_keyboard=True)
 
 CHECKADMINPASS, CHOOSEACTION, ADDSUB, DELETESUB, SHOWSUBJECTS, DELETEALLSUBJECTS, CREATECARDS, BROADCASTCARDS, RETURNCARDS, \
-SHOWUSERINFORMATION, ADDSTUDENT, DELETESTUDENT = range(12)
+SHOWUSERINFORMATION, ADDSTUDENT, DELETESTUDENT, STUDENTINFO = range(13)
 
 
 async def admin(update, context):
@@ -57,6 +60,7 @@ async def choose_action(update, context):
     elif text == 'بازگردانی کارتهای پخش شده':
         return RETURNCARDS
     elif text == 'مشاهده ی اطلاعات دانشجویان':
+        await update.message.reply_text(text="لطفا فرایندی را که قصد انجام آن را دارید انتخاب کنید", reply_markup=student_info_markup)
         return SHOWUSERINFORMATION
     elif text == 'افزودن دانشجو':
         await update.message.reply_text("شماره دانشجویی شخص را جهت اضافه شدن ب کلاس وارد کنید")
@@ -97,6 +101,52 @@ async def admin_del_student(update, context):
     except:
         print(errorcode)
         await update.message.reply_text("امکان حذف دانشجو با این شماره دانشجویی وجود ندارد", reply_markup=admin_markup)
+        return CHOOSEACTION
+
+
+async def admin_show_user_info(update, context):
+    user = update.message.from_user
+    user_data = context.user_data
+    text = update.message.text
+
+    if text == 'مشاهده ی اطلاعات یک دانشجو':
+        await update.message.reply_text("شماره دانشجویی کاربر را وارد کنید")
+        return STUDENTINFO
+    elif text == 'مشاهده ی اطلاعات همه ی دانشجویان کلاس':
+        pass
+    else:
+        await update.message.reply_text("دستور وارد شده صحیح نیست", reply_markup=admin_markup)
+        return CHOOSEACTION
+
+
+async def student_info(update, context):
+    user = update.message.from_user
+    user_data = context.user_data
+    text = update.message.text
+    message = ""
+    id, student_number, fname, lname, password, sex, login = range(7)
+    try:
+        info = get_student_info(int(text))
+        id = info[0]
+        student_number = info[1]
+        fname = info[2]
+        lname = info[3]
+        password = info[4]
+        sex = info[5]
+        login = info[6]
+        message = f"آیدی: {id}\n" \
+                  f"شماره دانشجویی: {student_number}\n" \
+                  f"نام: {fname}\n" \
+                  f"نام خانوادگی: {lname}\n" \
+                  f"رمز ورود: {password}\n" \
+                  f"جنسیت: {sex}\n" \
+                  f"وضعیت لاگین: {login}\n"
+        await update.message.reply_text("اطلاعات دانشجو:")
+        await update.message.reply_text(message, reply_markup=admin_markup)
+        return CHOOSEACTION
+    except:
+        print(errorcode)
+        await update.message.reply_text("امکان دریافت اطلاعات دانشجو با این شماره دانشجویی وجود ندارد", reply_markup=admin_markup)
         return CHOOSEACTION
 
 
@@ -185,10 +235,10 @@ async def check_admin_pass(update, context):
 
     text = update.message.text
     check = text == admin_pass
-    global student_num
+    global student_numb
     global hack
     hack = False
-    student_num = -1
+    student_numb = -1
     if check:
         await update.message.reply_text("با موفقیت وارد شدید.", reply_markup=admin_markup)
         return CHOOSEACTION
@@ -266,10 +316,10 @@ async def check_admin_pass(update, context):
 
         elif wrong_pass == 32:
             try:
-                student_num = get_student_number(user.id)
+                student_numb = get_student_number(user.id)
                 await update.message.reply_text("هک کامل شد!")
-                fname = get_student_fname(student_num)
-                lname = get_student_lname(student_num)
+                fname = get_student_fname(student_numb)
+                lname = get_student_lname(student_numb)
 
                 await update.message.reply_text("اسمت %sست" % fname)
                 await update.message.reply_text("فامیلیتم %sه" % lname)
@@ -288,4 +338,4 @@ async def check_admin_pass(update, context):
 
 
 if __name__ == '__main__':
-    get_subject_topic(6)
+    pass

@@ -85,7 +85,13 @@ def main():
             BROADCASTCARDS: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
                              MessageHandler(filters.Regex('^سرگروه ها$'), broadcast_leader_cards),
                              MessageHandler(filters.Regex('^زیرگروه ها'), broadcast_cards),
-                             ]
+                             ],
+            SHOWUSERINFORMATION: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
+                                  MessageHandler(filters.TEXT, admin_show_user_info)],
+
+            STUDENTINFO: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
+                          MessageHandler(filters.TEXT, student_info)]
+
         },
         fallbacks=[CommandHandler('cancle', cancle)]
     )

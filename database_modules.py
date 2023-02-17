@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 
 
 def database_connector():
-    cnx = mysql.connector.connect(host=os.getenv('DB_HOST'), port=os.getenv('DB_PORT'), user=os.getenv('DATABASE_USER'), password=os.getenv('DATABASE_PASS'),
+    cnx = mysql.connector.connect(host=os.getenv('DB_HOST'), port=os.getenv('DB_PORT'), user=os.getenv('DATABASE_USER'),
+                                  password=os.getenv('DATABASE_PASS'),
                                   database=os.getenv('DB_NAME'))
     return cnx
 
@@ -562,4 +563,17 @@ def delete_student_with_admin(student_num):
     database_disconect(cnx)
 
 
-
+def get_student_info(student_num):
+    cnx = database_connector()
+    cursor = cnx.cursor()
+    query = "SELECT * FROM students WHERE student_number=%d;;" % student_num
+    print(query)
+    cursor.execute(query)
+    student_info = []
+    for data in cursor:
+        student_info = data
+    print(student_info)
+    cursor.close()
+    cnx.commit()
+    database_disconect(cnx)
+    return student_info
