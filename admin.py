@@ -2,7 +2,6 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from main import bot, ConversationHandler
 from database_modules import *
 
-
 reply_keyboard = [
     ['موضوعات', 'دانشجویان'],
     ['کارتها'],
@@ -19,7 +18,7 @@ admin_markup = ReplyKeyboardMarkup(admin_reply_keyboard, resize_keyboard=True, o
 confirm_markup = ReplyKeyboardMarkup(confirm_keyboard, resize_keyboard=True, one_time_keyboard=True)
 broadcast_markup = ReplyKeyboardMarkup(reply_keyboard_broadcast, resize_keyboard=True, one_time_keyboard=True)
 
-CHECKADMINPASS, CHOOSEACTION, ADDSUB, DELETESUB, SHOWSUBJECTS, DELETEALLSUBJECTS, CREATECARDS, BROADCASTCARDS, RETURNCARDS,\
+CHECKADMINPASS, CHOOSEACTION, ADDSUB, DELETESUB, SHOWSUBJECTS, DELETEALLSUBJECTS, CREATECARDS, BROADCASTCARDS, RETURNCARDS, \
 SHOWUSERINFORMATION, ADDSTUDENT, DELETESTUDENT = range(12)
 
 
@@ -81,7 +80,23 @@ async def admin_add_student(update, context):
         return CHOOSEACTION
     except:
         print(errorcode)
-        await update.message.reply_text("امکان افزودن دانشجو با این شماره دانشجویی وجود ندارد", reply_markup=admin_markup)
+        await update.message.reply_text("امکان افزودن دانشجو با این شماره دانشجویی وجود ندارد",
+                                        reply_markup=admin_markup)
+        return CHOOSEACTION
+
+
+async def admin_del_student(update, context):
+    user = update.message.from_user
+    user_data = context.user_data
+    text = update.message.text
+
+    try:
+        delete_student_with_admin(int(text))
+        await update.message.reply_text("دانشجو با موفقیت از لیست کلاس حذف شد", reply_markup=admin_markup)
+        return CHOOSEACTION
+    except:
+        print(errorcode)
+        await update.message.reply_text("امکان حذف دانشجو با این شماره دانشجویی وجود ندارد", reply_markup=admin_markup)
         return CHOOSEACTION
 
 
@@ -141,7 +156,6 @@ async def broadcast_leader_cards(update, context):
 
 
 async def broadcast_cards(update, context):
-
     student_nums = get_student_nums()
     for student_number in student_nums:
         subject_id = get_subject_id(student_number)
@@ -271,7 +285,6 @@ async def check_admin_pass(update, context):
             user_data['enter_wrong_pass'] = 1
             return ConversationHandler.END
         return CHECKADMINPASS
-
 
 
 if __name__ == '__main__':

@@ -545,6 +545,16 @@ def add_student_with_admin(student_num):
     cursor = cnx.cursor()
     query = "INSERT INTO `students`(`id`,`student_number`,`first_name`,`last_name`,`password`,`sex`,`login`)" \
             "VALUES(-1, %d, '-1','-1','-1','M',-1);" % student_num
+    cursor.execute(query)
+    cursor.close()
+    cnx.commit()
+    database_disconect(cnx)
+
+
+def delete_student_with_admin(student_num):
+    cnx = database_connector()
+    cursor = cnx.cursor()
+    query = "DELETE FROM `students`WHERE student_number=%d;" % student_num
     print(query)
     cursor.execute(query)
     cursor.close()
