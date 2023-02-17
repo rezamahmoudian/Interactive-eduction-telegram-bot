@@ -90,7 +90,24 @@ def main():
                                   MessageHandler(filters.TEXT, admin_show_user_info)],
 
             STUDENTINFO: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
-                          MessageHandler(filters.TEXT, student_info)]
+                          MessageHandler(filters.TEXT, student_info)],
+            # add subject
+            TITLE: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
+                     MessageHandler(filters.TEXT, get_sub_title)],
+
+            TOPIC: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
+                    MessageHandler(filters.TEXT, get_sub_topic)],
+
+            DESCRIPTION: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
+                    MessageHandler(filters.TEXT, get_sub_description)],
+
+            WEEK: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
+                    MessageHandler(filters.TEXT, get_sub_week)],
+
+            SUBCONFIRMATION: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
+                              MessageHandler(filters.Regex('^مورد تایید است$'), sub_confirmation),
+                              MessageHandler(filters.Regex('^شروع دوباره$'), choose_action)],
+
 
         },
         fallbacks=[CommandHandler('cancle', cancle)]

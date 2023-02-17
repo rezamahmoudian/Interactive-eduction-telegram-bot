@@ -577,3 +577,29 @@ def get_student_info(student_num):
     cnx.commit()
     database_disconect(cnx)
     return student_info
+
+
+def add_subject(user_data):
+    items = []
+    for key, value in user_data.items():
+        if key in ('عنوان موضوع', 'سرفصل موضوع', 'توضیحات موضوع', 'شماره ی هفته'):
+            items.append(value)
+
+    print(items)
+    # add user to the database
+    cnx = database_connector()
+    cursor = cnx.cursor()
+
+    update_student = ("INSERT INTO `subjects`(`week`,`title`,`description`,`topic`)VALUES(%d, %s, %s, %s);")
+    # add_student = ("INSERT INTO students "
+    #                "(id, student_number, first_name, last_name, sex)"
+    #                "VALUES (%s, %s, %s, %s, %s)")
+
+    data_sub = (items[3], items[0], items[2], items[1])
+    print(update_student)
+    print(data_sub)
+    cursor.execute(update_student, data_sub)
+    cnx.commit()
+
+    cursor.close()
+    database_disconect(cnx)

@@ -16,13 +16,16 @@ confirm_keyboard = [['خیر', 'بله']]
 reply_keyboard_broadcast = [['زیرگروه ها', 'سرگروه ها']]
 reply_keyboard_student_info = [['مشاهده ی اطلاعات یک دانشجو'],
                                ['مشاهده ی اطلاعات همه ی دانشجویان کلاس']]
+reply_keyboard_sub_confirm = [['شروع دوباره', 'مورد تایید است']]
+
 admin_markup = ReplyKeyboardMarkup(admin_reply_keyboard, resize_keyboard=True, one_time_keyboard=True)
 confirm_markup = ReplyKeyboardMarkup(confirm_keyboard, resize_keyboard=True, one_time_keyboard=True)
 broadcast_markup = ReplyKeyboardMarkup(reply_keyboard_broadcast, resize_keyboard=True, one_time_keyboard=True)
 student_info_markup = ReplyKeyboardMarkup(reply_keyboard_student_info, resize_keyboard=True, one_time_keyboard=True)
+markup_sub_confirmation = ReplyKeyboardMarkup(reply_keyboard_sub_confirm, resize_keyboard=True, one_time_keyboard=True)
 
 CHECKADMINPASS, CHOOSEACTION, ADDSUB, DELETESUB, SHOWSUBJECTS, DELETEALLSUBJECTS, CREATECARDS, BROADCASTCARDS, RETURNCARDS, \
-SHOWUSERINFORMATION, ADDSTUDENT, DELETESTUDENT, STUDENTINFO = range(13)
+SHOWUSERINFORMATION, ADDSTUDENT, DELETESTUDENT, STUDENTINFO, TITLE, DESCRIPTION, TOPIC, WEEK, SUBCONFIRMATION = range(18)
 
 
 async def admin(update, context):
@@ -44,7 +47,8 @@ async def choose_action(update, context):
 
     text = update.message.text
     if text == 'افزودن موضوع':
-        return ADDSUB
+        await update.message.reply_text("عنوان موضوع را وارد کنید")
+        return TITLE
     elif text == 'حذف موضوع':
         return DELETESUB
     elif text == 'نمایش موضوعات':
@@ -69,7 +73,7 @@ async def choose_action(update, context):
         await update.message.reply_text("شماره دانشجویی شخص را جهت حذف از کلاس وارد کنید")
         return DELETESTUDENT
     else:
-        await update.message.reply_text("لطفا دستور صحیح را وارد کنید.")
+        await update.message.reply_text("لطفا یکی از دستورات را وارد کنید.", reply_markup=admin_markup)
         return CHOOSEACTION
 
 
@@ -336,6 +340,68 @@ async def check_admin_pass(update, context):
             return ConversationHandler.END
         return CHECKADMINPASS
 
+
+async def get_sub_title(update, context):
+    user = update.message.from_user
+    user_data = context.user_data
+    category = 'عنوان موضوع'
+    text = update.message.text
+    user_data[category] = text
+    await update.message.reply_text("سرفصل را بنویسید:")
+    await update.message.reply_text("در انتخاب سرفصل دقت کنید.موضوعات دارای سرفصل یکسان در یک گروه قرار میگیرند")
+    return TOPIC
+
+
+async def get_sub_topic(update, context):
+    user = update.message.from_user
+    user_data = context.user_data
+    category = 'سرفصل موضوع'
+    text = update.message.text
+    user_data[category] = text
+    await update.message.reply_text("توضیحات مربوط ب این موضوع را بنویسید")
+    return DESCRIPTION
+
+
+async def get_sub_description(update, context):
+    user = update.message.from_user
+    user_data = context.user_data
+    category = 'توضیحات موضوع'
+    text = update.message.text
+    user_data[category] = text
+    await update.message.reply_text("شماره ی هفته ی مربوط به این موضوع را بنویسید")
+    return WEEK
+
+def admin_facts_to_str(user_data):
+    facts = list()
+
+    for key, value in user_data.items():
+        if key in ('عنوان موضوع', 'سرفصل موضوع', 'توضیحات موضوع', 'شماره ی هفته'):
+            facts.append('{} - {}'.format(key, value))
+
+    return "\n".join(facts).join(['\n', '\n'])
+
+
+async def get_sub_week(update, context):
+    user = update.message.from_user
+    user_data = context.user_data
+    category = 'شماره ی هفته'
+    text = update.message.text
+    user_data[category] = text
+    await update.message.reply_text(
+        'لطفا بررسی کنید که آیا اطلاعات مورد تاییدتان است یا نه {}'.format(
+            admin_facts_to_str(user_data)), reply_markup=markup_sub_confirmation)
+    return SUBCONFIRMATION
+
+
+async def sub_confirmation(update, context):
+    user = update.message.from_user
+    user_data = context.user_data
+
+    add_subject(user_data)
+
+    await update.message.reply_text("موضوع به لیست موضوعات اضافه شد", reply_markup=ReplyKeyboardRemove())
+
+    return CHOOSEACTION
 
 if __name__ == '__main__':
     pass
