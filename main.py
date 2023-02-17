@@ -63,6 +63,9 @@ def main():
     admin_conv_handler = ConversationHandler(
         entry_points=[CommandHandler('admin', admin)],
         states={
+            ADDSTUDENT: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
+                         MessageHandler(filters.TEXT, admin_add_student),
+                         ],
             CHECKADMINPASS: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
                              MessageHandler(filters.TEXT, check_admin_pass)],
             # CHOOSEACTION: [CommandHandler('admin', admin),
