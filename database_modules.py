@@ -622,7 +622,7 @@ def db_get_subjects():
     cnx = database_connector()
     cursor = cnx.cursor()
     subjects = []
-    query = "SELECT * FROM subjects1;"
+    query = "SELECT * FROM subjects;"
     cursor.execute(query)
     for data in cursor:
         subjects.append(str(data))

@@ -113,6 +113,8 @@ def main():
                            MessageHandler(filters.Regex('^خیر'), choose_action),
                            ],
 
+            DELETESUB: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
+                        MessageHandler(filters.TEXT, del_subject)],
         },
         fallbacks=[CommandHandler('cancle', cancle)]
     )

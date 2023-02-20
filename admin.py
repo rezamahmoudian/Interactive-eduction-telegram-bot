@@ -50,6 +50,7 @@ async def choose_action(update, context):
         await update.message.reply_text("عنوان موضوع را وارد کنید")
         return TITLE
     elif text == 'حذف موضوع':
+        await update.message.reply_text("آیدی موضوعی که قصد حذف آنرا دارید بنویسید")
         return DELETESUB
     elif text == 'نمایش موضوعات':
         await update.message.reply_text("آیا از انجام این فرایند مطمئن هستید؟", reply_markup=confirm_markup)
