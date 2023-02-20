@@ -34,7 +34,7 @@ def create_database():
 
     TABLES['subjects'] = (
         "CREATE TABLE `subjects` ("
-        "  `id` int(11) NOT NULL,"
+        "  `id` int(11) NOT NULL AUTO_INCREMENT,"
         "  `week` int(8) NOT NULL,"
         "  `title` varchar(200) NOT NULL,"
         "  `description` text ,"
@@ -581,24 +581,33 @@ def get_student_info(student_num):
 
 def add_subject(user_data):
     items = []
+    print(user_data.items())
     for key, value in user_data.items():
         if key in ('عنوان موضوع', 'سرفصل موضوع', 'توضیحات موضوع', 'شماره ی هفته'):
             items.append(value)
+            print(items)
 
     print(items)
     # add user to the database
     cnx = database_connector()
     cursor = cnx.cursor()
 
-    update_student = ("INSERT INTO `subjects`(`week`,`title`,`description`,`topic`)VALUES(%d, %s, %s, %s);")
-    # add_student = ("INSERT INTO students "
+    print("week ="+ str(items[3]))
+    print("title ="+ str(items[0]))
+    print("descrip ="+ str(items[2]))
+    print("topic ="+ str(items[1]))
+
+    update_student = "INSERT INTO `subjects`(`week`,`title`,`description`,`topic`)VALUES" \
+                     "('{week}', '{title}', '{des}', '{topic}'); ".format(week=int(items[3]), title=items[0], des=items[2], topic=items[1])
+    # d_student = ("INSERT INTO students "
     #                "(id, student_number, first_name, last_name, sex)"
     #                "VALUES (%s, %s, %s, %s, %s)")
 
-    data_sub = (items[3], items[0], items[2], items[1])
+    # data_sub = (items[3], items[1], items[2], items[0])
     print(update_student)
-    print(data_sub)
-    cursor.execute(update_student, data_sub)
+    # print(data_sub)
+    # print(update_student)
+    cursor.execute(update_student)
     cnx.commit()
 
     cursor.close()

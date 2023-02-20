@@ -399,7 +399,7 @@ async def sub_confirmation(update, context):
 
     add_subject(user_data)
 
-    await update.message.reply_text("موضوع به لیست موضوعات اضافه شد", reply_markup=ReplyKeyboardRemove())
+    await update.message.reply_text("موضوع به لیست موضوعات اضافه شد", reply_markup=admin_markup)
 
     return CHOOSEACTION
 
