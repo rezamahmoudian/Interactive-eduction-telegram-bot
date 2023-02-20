@@ -52,6 +52,7 @@ async def choose_action(update, context):
     elif text == 'حذف موضوع':
         return DELETESUB
     elif text == 'نمایش موضوعات':
+        await update.message.reply_text("آیا از انجام این فرایند مطمئن هستید؟", reply_markup=confirm_markup)
         return SHOWSUBJECTS
     elif text == 'حذف همه ی موضوعات':
         return DELETEALLSUBJECTS
@@ -410,12 +411,13 @@ async def del_subject(update, context):
     return CHOOSEACTION
 
 
-async def get_subjects(update, context):
+async def show_subjects(update, context):
     subjects = db_get_subjects()
-    text = "\n".join(subjects)
+    text = "\n \n".join(subjects)
     await update.message.reply_text(text, reply_markup=admin_markup)
     return CHOOSEACTION
 
 
 if __name__ == '__main__':
-    get_subjects()
+    # show_subjects()
+    pass

@@ -1,5 +1,5 @@
 from __future__ import print_function
-from telegram.ext import (CommandHandler, MessageHandler, filters, ApplicationBuilder)
+from telegram.ext import (CommandHandler, MessageHandler, filters, ApplicationBuilder,CallbackQueryHandler)
 import os
 from users import *
 from admin import *
@@ -108,6 +108,10 @@ def main():
                               MessageHandler(filters.Regex('^مورد تایید است$'), sub_confirmation),
                               MessageHandler(filters.Regex('^شروع دوباره$'), choose_action)],
 
+            SHOWSUBJECTS: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
+                           MessageHandler(filters.Regex('^بله$'), show_subjects),
+                           MessageHandler(filters.Regex('^خیر'), choose_action),
+                           ],
 
         },
         fallbacks=[CommandHandler('cancle', cancle)]
