@@ -410,5 +410,12 @@ async def del_subject(update, context):
     return CHOOSEACTION
 
 
+async def get_subjects(update, context):
+    subjects = db_get_subjects()
+    text = "\n".join(subjects)
+    await update.message.reply_text(text, reply_markup=admin_markup)
+    return CHOOSEACTION
+
+
 if __name__ == '__main__':
-    db_del_sub(2)
+    get_subjects()

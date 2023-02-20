@@ -600,14 +600,7 @@ def add_subject(user_data):
     update_student = "INSERT INTO `subjects`(`week`,`title`,`description`,`topic`)VALUES" \
                      "('{week}', '{title}', '{des}', '{topic}'); ".format(week=int(items[3]), title=items[0],
                                                                           des=items[2], topic=items[1])
-    # d_student = ("INSERT INTO students "
-    #                "(id, student_number, first_name, last_name, sex)"
-    #                "VALUES (%s, %s, %s, %s, %s)")
-
-    # data_sub = (items[3], items[1], items[2], items[0])
     print(update_student)
-    # print(data_sub)
-    # print(update_student)
     cursor.execute(update_student)
     cnx.commit()
 
@@ -623,3 +616,16 @@ def db_del_sub(id):
     cursor.close()
     cnx.commit()
     database_disconect(cnx)
+
+
+def db_get_subjects():
+    cnx = database_connector()
+    cursor = cnx.cursor()
+    subjects = []
+    query = "SELECT * FROM subjects1;"
+    cursor.execute(query)
+    for data in cursor:
+        subjects.append(str(data))
+    cursor.close()
+    database_disconect(cnx)
+    return subjects
