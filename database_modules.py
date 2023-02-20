@@ -566,7 +566,7 @@ def delete_student_with_admin(student_num):
 def get_student_info(student_num):
     cnx = database_connector()
     cursor = cnx.cursor()
-    query = "SELECT * FROM students WHERE student_number=%d;;" % student_num
+    query = "SELECT * FROM students WHERE student_number=%d;" % student_num
     print(query)
     cursor.execute(query)
     student_info = []
@@ -592,13 +592,14 @@ def add_subject(user_data):
     cnx = database_connector()
     cursor = cnx.cursor()
 
-    print("week ="+ str(items[3]))
-    print("title ="+ str(items[0]))
-    print("descrip ="+ str(items[2]))
-    print("topic ="+ str(items[1]))
+    print("week =" + str(items[3]))
+    print("title =" + str(items[0]))
+    print("descrip =" + str(items[2]))
+    print("topic =" + str(items[1]))
 
     update_student = "INSERT INTO `subjects`(`week`,`title`,`description`,`topic`)VALUES" \
-                     "('{week}', '{title}', '{des}', '{topic}'); ".format(week=int(items[3]), title=items[0], des=items[2], topic=items[1])
+                     "('{week}', '{title}', '{des}', '{topic}'); ".format(week=int(items[3]), title=items[0],
+                                                                          des=items[2], topic=items[1])
     # d_student = ("INSERT INTO students "
     #                "(id, student_number, first_name, last_name, sex)"
     #                "VALUES (%s, %s, %s, %s, %s)")
@@ -611,4 +612,14 @@ def add_subject(user_data):
     cnx.commit()
 
     cursor.close()
+    database_disconect(cnx)
+
+
+def db_del_sub(id):
+    cnx = database_connector()
+    cursor = cnx.cursor()
+    query = "DELETE FROM `subjects` WHERE (`id` = %d);" % id
+    cursor.execute(query)
+    cursor.close()
+    cnx.commit()
     database_disconect(cnx)

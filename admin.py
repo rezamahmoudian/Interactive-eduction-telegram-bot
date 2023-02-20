@@ -371,6 +371,7 @@ async def get_sub_description(update, context):
     await update.message.reply_text("شماره ی هفته ی مربوط به این موضوع را بنویسید")
     return WEEK
 
+
 def admin_facts_to_str(user_data):
     facts = list()
 
@@ -398,10 +399,16 @@ async def sub_confirmation(update, context):
     user_data = context.user_data
 
     add_subject(user_data)
-
     await update.message.reply_text("موضوع به لیست موضوعات اضافه شد", reply_markup=admin_markup)
-
     return CHOOSEACTION
 
+
+async def del_subject(update, context):
+    text = update.message.text
+    db_del_sub(text)
+    await update.message.reply_text("موضوع با موفقیت حذف شد", reply_markup=admin_markup)
+    return CHOOSEACTION
+
+
 if __name__ == '__main__':
-    pass
+    db_del_sub(2)
