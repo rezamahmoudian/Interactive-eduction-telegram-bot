@@ -414,8 +414,11 @@ async def del_subject(update, context):
 
 async def show_subjects(update, context):
     subjects = db_get_subjects()
-    text = "\n \n".join(subjects)
-    await update.message.reply_text(text, reply_markup=admin_markup)
+    if len(subjects) != 0:
+        text = "\n \n".join(subjects)
+        await update.message.reply_text(text, reply_markup=admin_markup)
+    else:
+        await update.message.reply_text("موضوعی وجود ندارد", reply_markup=admin_markup)
     return CHOOSEACTION
 
 

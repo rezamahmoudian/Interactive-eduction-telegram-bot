@@ -611,7 +611,7 @@ def add_subject(user_data):
 def db_del_sub(id):
     cnx = database_connector()
     cursor = cnx.cursor()
-    query = "DELETE FROM `subjects` WHERE (`id` = %d);" % id
+    query = "DELETE FROM `subjects` WHERE (`id` = %d);" % int(id)
     cursor.execute(query)
     cursor.close()
     cnx.commit()
