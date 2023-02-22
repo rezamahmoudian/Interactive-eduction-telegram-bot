@@ -194,7 +194,7 @@ async def add_cards_db(update, context):
             cursor = cnx.cursor()
     cnx.commit()
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     await update.message.reply_text("کارتها با موفقیت در دیتابیس ایجاد شدند.", reply_markup=admin_markup)
     return CHOOSEACTION
 

@@ -92,7 +92,7 @@ def create_database():
             print("OK")
 
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
 
 
 def login(student_num):
