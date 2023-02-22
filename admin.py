@@ -183,19 +183,21 @@ async def add_cards_db(update, context):
     cursor.execute(delete_cards)
     cnx.commit()
     cursor.close()
-    cards = create_cards()
-    cursor = cnx.cursor()
-    for data in cards:
-        for i in range(len(data) - 1):
-            add_card = "INSERT INTO `cards`(`student_id`,`subject_id`) VALUES " \
-                       "({student_id},{subject_id})".format(student_id=data[i + 1], subject_id=data[0])
-            print(add_card)
-            cursor.execute(add_card)
-            cursor = cnx.cursor()
-    cnx.commit()
-    cursor.close()
-    cnx.close()
-    await update.message.reply_text("کارتها با موفقیت در دیتابیس ایجاد شدند.", reply_markup=admin_markup)
+    try:
+        cards = create_cards()
+        cursor = cnx.cursor()
+        for data in cards:
+            for i in range(len(data) - 1):
+                add_card = "INSERT INTO `cards`(`student_id`,`subject_id`) VALUES " \
+                           "({student_id},{subject_id})".format(student_id=data[i + 1], subject_id=data[0])
+                cursor.execute(add_card)
+                cursor = cnx.cursor()
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        await update.message.reply_text("کارتها با موفقیت در دیتابیس ایجاد شدند.", reply_markup=admin_markup)
+    except:
+        await update.message.reply_text("کارتها ایجاد نشدند.", reply_markup=admin_markup)
     return CHOOSEACTION
 
 
