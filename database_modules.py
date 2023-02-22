@@ -629,3 +629,17 @@ def db_get_subjects():
     cursor.close()
     database_disconect(cnx)
     return subjects
+
+
+def db_get_students():
+    cnx = database_connector()
+    cursor = cnx.cursor()
+    students = []
+    query = "SELECT * FROM students;"
+    cursor.execute(query)
+    for data in cursor:
+        students.append(str(data))
+    cursor.close()
+    database_disconect(cnx)
+    return students
+

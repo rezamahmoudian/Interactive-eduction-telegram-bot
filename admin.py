@@ -25,7 +25,7 @@ student_info_markup = ReplyKeyboardMarkup(reply_keyboard_student_info, resize_ke
 markup_sub_confirmation = ReplyKeyboardMarkup(reply_keyboard_sub_confirm, resize_keyboard=True, one_time_keyboard=True)
 
 CHECKADMINPASS, CHOOSEACTION, ADDSUB, DELETESUB, SHOWSUBJECTS, DELETEALLSUBJECTS, CREATECARDS, BROADCASTCARDS, RETURNCARDS, \
-SHOWUSERINFORMATION, ADDSTUDENT, DELETESTUDENT, STUDENTINFO, TITLE, DESCRIPTION, TOPIC, WEEK, SUBCONFIRMATION = range(18)
+SHOWUSERINFORMATION, ADDSTUDENT, DELETESTUDENT, STUDENTINFO,ALLSTUDENTSINFO, TITLE, DESCRIPTION, TOPIC, WEEK, SUBCONFIRMATION = range(19)
 
 
 async def admin(update, context):
@@ -119,7 +119,8 @@ async def admin_show_user_info(update, context):
         await update.message.reply_text("شماره دانشجویی کاربر را وارد کنید")
         return STUDENTINFO
     elif text == 'مشاهده ی اطلاعات همه ی دانشجویان کلاس':
-        pass
+        await update.message.reply_text("آیا از انجام این فرایند مطمئن هستید؟", reply_markup=confirm_markup)
+        return ALLSTUDENTSINFO
     else:
         await update.message.reply_text("دستور وارد شده صحیح نیست", reply_markup=admin_markup)
         return CHOOSEACTION
@@ -154,6 +155,16 @@ async def student_info(update, context):
         print(errorcode)
         await update.message.reply_text("امکان دریافت اطلاعات دانشجو با این شماره دانشجویی وجود ندارد", reply_markup=admin_markup)
         return CHOOSEACTION
+
+
+async def all_students_info(update, context):
+    students = db_get_students()
+    if len(students) != 0:
+        text = "\n \n".join(students)
+        await update.message.reply_text(text, reply_markup=admin_markup)
+    else:
+        await update.message.reply_text("دانشجویی وجود ندارد", reply_markup=admin_markup)
+    return CHOOSEACTION
 
 
 async def create_card_cancel(update, context):

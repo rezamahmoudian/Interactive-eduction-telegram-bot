@@ -91,6 +91,9 @@ def main():
 
             STUDENTINFO: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
                           MessageHandler(filters.TEXT, student_info)],
+
+            ALLSTUDENTSINFO: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
+                              MessageHandler(filters.TEXT, all_students_info)],
             # add subject
             TITLE: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
                      MessageHandler(filters.TEXT, get_sub_title)],
