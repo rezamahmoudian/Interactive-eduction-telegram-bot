@@ -123,7 +123,7 @@ async def sex(update, context):
 
     logger.info("sex of %s: %s", user.first_name, update.message.text)
 
-    await update.message.reply_text("لطفا برای اکانت خود یک پسوورد انتخاب کنید:")
+    await update.message.reply_text("لطفا برای اکانت خود یک پسوورد انتخاب کنید:", reply_markup=ReplyKeyboardRemove())
 
     return PASSWORD
 
@@ -176,7 +176,7 @@ async def confirmation(update, context):
     add_student(user.id, user_data)
 
     await update.message.reply_text("اطلاعات شما ثبت شد!", reply_markup=ReplyKeyboardRemove())
-    await update.message.reply_text("برای ورود شماره دانشجویی خود را وارد کنید:")
+    await update.message.reply_text("برای ورود شماره دانشجویی خود را وارد کنید:",  reply_markup=ReplyKeyboardRemove())
 
     return STUDENT_NUMBER
 

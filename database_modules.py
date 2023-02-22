@@ -29,7 +29,7 @@ def create_database():
         "  `password` varchar(20) NOT NULL,"
         "  `sex` enum('M','F') NOT NULL,"
         "  `login` int(2) NOT NULL,"
-        "  PRIMARY KEY (`id`)"
+        "  PRIMARY KEY (`student_number`)"
         ") ENGINE=InnoDB")
 
     TABLES['subjects'] = (
@@ -211,6 +211,7 @@ def check_telegram_id_exist(user_id):
 
 def add_student(user_id, user_data):
     items = []
+    sex = ''
     for key, value in user_data.items():
         items.append(value)
     if items[3] == 'مرد':
@@ -281,7 +282,6 @@ def create_leader_cards(man, female):
 
     topics = list(dict.fromkeys(topics))
     cursor.close()
-    database_disconect(cnx)
     leader_cards = []
     if len(man) > len(female):
         for i in range(len(topics)):
@@ -290,6 +290,7 @@ def create_leader_cards(man, female):
             card.append(man[0])
             man.pop(0)
             leader_cards.append(card)
+    database_disconect(cnx)
     return leader_cards
 
 
