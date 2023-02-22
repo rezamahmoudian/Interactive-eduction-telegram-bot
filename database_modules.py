@@ -12,10 +12,6 @@ def database_connector():
     return cnx
 
 
-def database_disconect(cnx):
-    cnx.close()
-
-
 # USERS
 def create_database():
     DB_NAME = os.getenv('DB_NAME')
@@ -108,7 +104,7 @@ def login(student_num):
     cnx.commit()
 
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
 
 
 def logout_db(user_id):
@@ -120,7 +116,7 @@ def logout_db(user_id):
     cursor.execute(query)
     cnx.commit()
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
 
 
 def check_log(user_id):
@@ -137,7 +133,7 @@ def check_log(user_id):
             check = False
 
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return check
 
 
@@ -154,7 +150,7 @@ def check_student_number(student_number):
                 check = True
 
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return check
 
 
@@ -171,7 +167,7 @@ def check_student_data(student_num):
                 check = True
 
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return check
 
 
@@ -188,7 +184,7 @@ def check_password_from_db(student_num, password):
                 check = True
 
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return check
 
 
@@ -205,7 +201,7 @@ def check_telegram_id_exist(user_id):
                 check = True
 
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return check
 
 
@@ -235,7 +231,7 @@ def add_student(user_id, user_data):
     cnx.commit()
 
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
 
 
 # ADMINS
@@ -250,7 +246,7 @@ def get_man_students():
     for data in cursor:
         man.append(data[1])
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return man
 
 
@@ -266,7 +262,7 @@ def get_female_students():
         female.append(data[1])
 
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return female
 
 
@@ -290,7 +286,7 @@ def create_leader_cards(man, female):
             card.append(man[0])
             man.pop(0)
             leader_cards.append(card)
-    database_disconect(cnx)
+    cnx.close()
     return leader_cards
 
 
@@ -314,7 +310,7 @@ def create_cards():
         subjects.append(data[0])
 
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
 
     cards = []
 
@@ -374,7 +370,7 @@ def add_leader_cards_db(leader_cards):
     cnx.commit()
 
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
 
 
 def get_leader_nums():
@@ -390,7 +386,7 @@ def get_leader_nums():
             leader_nums.append(student_num)
     print(leader_nums)
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return leader_nums
 
 
@@ -403,7 +399,7 @@ def get_student_chat_id(student_num):
     for data in cursor:
         student_chat_id = data[0]
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return student_chat_id
 
 
@@ -416,7 +412,7 @@ def get_student_fname(student_num):
     for data in cursor:
         first_name = data[0]
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return first_name
 
 
@@ -430,7 +426,7 @@ def get_student_number(chat_id):
         student_num = data[0]
     print("student num =" + str(student_num))
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return int(student_num)
 
 
@@ -443,7 +439,7 @@ def get_student_lname(student_num):
     for data in cursor:
         last_name = data[0]
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return last_name
 
 
@@ -456,7 +452,7 @@ def get_leader_topic(student_num):
     for data in cursor:
         topic = data[0]
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return topic
 
 
@@ -469,7 +465,7 @@ def get_leader_description(student_num):
     for data in cursor:
         description = data[0]
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return description
 
 
@@ -483,7 +479,7 @@ def get_student_nums():
         for student_num in data:
             student_nums.append(student_num)
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return student_nums
 
 
@@ -496,7 +492,7 @@ def get_subject_id(student_num):
     for data in cursor:
         subject_id = data[0]
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return subject_id
 
 
@@ -510,7 +506,7 @@ def get_subject_title(subject_id):
     for data in cursor:
         subject_title = data[0]
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return subject_title
 
 
@@ -524,7 +520,7 @@ def get_subject_description(subject_id):
     for data in cursor:
         subject_description = data[0]
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return subject_description
 
 
@@ -538,7 +534,7 @@ def get_subject_topic(subject_id):
     for data in cursor:
         subject_topic = data[0]
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return subject_topic
 
 
@@ -550,7 +546,7 @@ def add_student_with_admin(student_num):
     cursor.execute(query)
     cursor.close()
     cnx.commit()
-    database_disconect(cnx)
+    cnx.close()
 
 
 def delete_student_with_admin(student_num):
@@ -561,7 +557,7 @@ def delete_student_with_admin(student_num):
     cursor.execute(query)
     cursor.close()
     cnx.commit()
-    database_disconect(cnx)
+    cnx.close()
 
 
 def get_student_info(student_num):
@@ -576,7 +572,7 @@ def get_student_info(student_num):
     print(student_info)
     cursor.close()
     cnx.commit()
-    database_disconect(cnx)
+    cnx.close()
     return student_info
 
 
@@ -606,7 +602,7 @@ def add_subject(user_data):
     cnx.commit()
 
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
 
 
 def db_del_sub(id):
@@ -616,7 +612,7 @@ def db_del_sub(id):
     cursor.execute(query)
     cursor.close()
     cnx.commit()
-    database_disconect(cnx)
+    cnx.close()
 
 
 def db_get_subjects():
@@ -628,7 +624,7 @@ def db_get_subjects():
     for data in cursor:
         subjects.append(str(data))
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return subjects
 
 
@@ -641,6 +637,6 @@ def db_get_students():
     for data in cursor:
         students.append(str(data))
     cursor.close()
-    database_disconect(cnx)
+    cnx.close()
     return students
 
