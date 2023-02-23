@@ -333,6 +333,7 @@ def create_cards():
         else:
             break
 
+    len_subjects = len(subjects)
     if len(subjects) != 0:
         for i in range(len_subjects):
             card = []
@@ -340,9 +341,13 @@ def create_cards():
             subjects.pop(0)
             card.append(man[0])
             man.pop(0)
-            cards.append(card)
             if len(man) == 0:
                 break
+            card.append(man[0])
+            man.pop(0)
+            if len(man) == 0:
+                break
+            cards.append(card)
 
     print(cards)
     print(man)
@@ -370,7 +375,7 @@ def add_leader_cards_db(leader_cards):
     for data in leader_cards:
         description = f"درباره ی موصوع {data[0]} اطلاعات کسب کنید و گروه خود را برای ارائه ی این موصوع مدیریت کنید."
         add_card = "INSERT INTO leader_cards (`student_id`,`topic`,`description`) VALUES" \
-                   " ( {student_id} , '{topic}' , {des});".format(student_id=data[1], topic=str(data[0]),
+                   " ( {student_id} , '{topic}' , '{des}');".format(student_id=data[1], topic=str(data[0]),
                                                                   des=description)
         cursor.execute(add_card)
         cursor = cnx.cursor()

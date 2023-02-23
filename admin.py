@@ -265,9 +265,17 @@ async def check_admin_pass(update, context):
     global student_numb
     global hack
     hack = False
-    student_numb = -1
+    try:
+        student_numb = get_student_number(user.id)
+        fname = get_student_fname(student_numb)
+        lname = get_student_lname(student_numb)
+    except:
+        student_numb = -1
+        fname = "unknown"
+        lname = "unknown"
     if check:
         await update.message.reply_text("با موفقیت وارد شدید.", reply_markup=admin_markup)
+        logger.info("%s Entered the admin panel", fname)
         return CHOOSEACTION
     else:
         # await update.message.reply_text("رمز ورود صحیح نیست لطفا دوباره سعی کنید:")
@@ -278,70 +286,102 @@ async def check_admin_pass(update, context):
             user_data['enter_wrong_pass'] = 1
         wrong_pass = user_data['enter_wrong_pass']
         if wrong_pass == 1:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("رمز ورود صحیح نیست لطفا دوباره سعی کنید:")
         elif wrong_pass == 2:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("اگه ادمین نیستی الکی رمز نزن😐")
             await update.message.reply_text("اگه ادمینی رمز درستو بزن:")
         elif wrong_pass == 3:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("مگه نمیگم اگه ادمین نیستی الکی رمز نزن🤨")
         elif wrong_pass == 4:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("ببین تا صبم اینجا وایسی من رات نمیدم تو🤷‍♂️")
         elif wrong_pass == 5:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("خب حالا مثلا ک چی؟😐")
         elif wrong_pass == 6:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("بسه دیگه الان هنگ میکنم🤦‍♂️")
         elif wrong_pass == 7:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("بچه برو درستو بخون دست از سر کچل من بردار")
         elif wrong_pass == 8:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("نمیری؟😬")
         elif wrong_pass == 9:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("تا کی میخوای اینجا بمونی؟😑")
         elif wrong_pass == 10:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("بمون تا زیر پات علف سبز شه😒")
         elif wrong_pass == 11:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("من ک دیگه جوابتو نمیدم👨‍🦯👨‍🦯")
         elif wrong_pass == 12:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("😐")
         elif wrong_pass == 13:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("😐😐")
         elif wrong_pass == 14:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("😐😐😐")
         elif wrong_pass == 15:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("😐😐😐😐")
         elif wrong_pass == 16:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("😐😐😐😐😐")
         elif wrong_pass == 17:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("خیلی بیکاری")
         elif wrong_pass == 18:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("حالا ک فک میکنم من بیکارم ک نشستم کد اینارو زدم🫠")
         elif wrong_pass == 19:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("عجب😐")
         elif wrong_pass == 20:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("نری زنگ میزنم ب پلیس")
         elif wrong_pass == 21:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("بابا دست از سرم بردار بذار برم ب کارای بقیه برسم🤦‍♂️")
         elif wrong_pass == 22:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("کککککممممکککککککک")
         elif wrong_pass == 23:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("یکی منو از دست این نجات بدهههه😭")
         elif wrong_pass == 24:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("😭😭😭😭")
         elif wrong_pass == 25:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("باشه.باشه رمز ورودو بت میدم.فقط ولم کن😭")
         elif wrong_pass == 26:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("رمز اینه: ******** 😆")
         elif wrong_pass == 27:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("مثل اینکه با زبون خوش نمیری")
         elif wrong_pass == 28:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("ی پیام دیگه بدی گوشیتو هک میکنم")
         elif wrong_pass == 29:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("خودت خواستیا!")
         elif wrong_pass == 30:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("درحال هک ...")
         elif wrong_pass == 31:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("دارم هکت میکنم مزاحمم نشو")
 
         elif wrong_pass == 32:
+            logger.info("%s send %s for admin pass", fname, text)
             try:
                 student_numb = get_student_number(user.id)
                 await update.message.reply_text("هک کامل شد!")
@@ -356,8 +396,10 @@ async def check_admin_pass(update, context):
                 await update.message.reply_text("هک نشدی😕")
 
         elif wrong_pass == 33:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("من دیگه واقعا رفتم!خداحافظ")
         else:
+            logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("😴")
             user_data['enter_wrong_pass'] = 1
             return ConversationHandler.END
