@@ -328,6 +328,8 @@ def create_cards():
                 cards.append(card)
                 if len(man) == 0 or len(female) == 0:
                     break
+            if len(man) == 0 or len(female) == 0:
+                break
         else:
             break
 
@@ -339,7 +341,7 @@ def create_cards():
             card.append(man[0])
             man.pop(0)
             cards.append(card)
-            if len(subjects) == 0:
+            if len(man) == 0:
                 break
 
     print(cards)
