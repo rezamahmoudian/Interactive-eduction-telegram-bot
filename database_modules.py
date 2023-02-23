@@ -323,13 +323,11 @@ def create_cards():
                 subjects.pop(0)
                 card.append(man[0])
                 man.pop(0)
-                if len(man) == 0:
-                    break
                 card.append(female[0])
                 female.pop(0)
-                if len(female) == 0:
-                    break
                 cards.append(card)
+                if len(man) == 0 or len(female) == 0:
+                    break
         else:
             break
 

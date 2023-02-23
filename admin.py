@@ -183,8 +183,10 @@ async def add_cards_db(update, context):
     cursor.execute(delete_cards)
     cnx.commit()
     cursor.close()
+    cnx.close()
     try:
         cards = create_cards()
+        cnx = database_connector()
         cursor = cnx.cursor()
         for data in cards:
             for i in range(len(data) - 1):
@@ -197,6 +199,7 @@ async def add_cards_db(update, context):
         cnx.close()
         await update.message.reply_text("کارتها با موفقیت در دیتابیس ایجاد شدند.", reply_markup=admin_markup)
     except:
+        print(errorcode)
         await update.message.reply_text("کارتها ایجاد نشدند.", reply_markup=admin_markup)
     return CHOOSEACTION
 
