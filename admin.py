@@ -52,34 +52,45 @@ async def choose_action(update, context):
     text = update.message.text
     if text == 'افزودن موضوع':
         await update.message.reply_text("عنوان موضوع را وارد کنید")
+        logger.info("admin select add subject")
         return TITLE
     elif text == 'حذف موضوع':
         await update.message.reply_text("آیدی موضوعی که قصد حذف آنرا دارید بنویسید")
+        logger.info("admin select dell subject")
         return DELETESUB
     elif text == 'نمایش موضوعات':
         await update.message.reply_text("آیا از انجام این فرایند مطمئن هستید؟", reply_markup=confirm_markup)
+        logger.info("admin select show subjects")
         return SHOWSUBJECTS
     elif text == 'حذف همه ی موضوعات':
+        logger.info("admin select delete all subjects")
         return DELETEALLSUBJECTS
     elif text == 'ایجاد کارتها':
         await update.message.reply_text("آیا از انجام این فرایند مطمئن هستید؟", reply_markup=confirm_markup)
+        logger.info("admin select create cards")
         return CREATECARDS
     elif text == 'پخش کارتها':
         await update.message.reply_text("قصد پخش کدام دسته از کارتها را دارید؟", reply_markup=broadcast_markup)
+        logger.info("admin select broadcast cards")
         return BROADCASTCARDS
     elif text == 'بازگردانی کارتهای پخش شده':
+        logger.info("admin select return cards")
         return RETURNCARDS
     elif text == 'مشاهده ی اطلاعات دانشجویان':
         await update.message.reply_text(text="لطفا فرایندی را که قصد انجام آن را دارید انتخاب کنید", reply_markup=student_info_markup)
+        logger.info("admin select show students information")
         return SHOWUSERINFORMATION
     elif text == 'افزودن دانشجو':
         await update.message.reply_text("شماره دانشجویی شخص را جهت اضافه شدن ب کلاس وارد کنید")
+        logger.info("admin select add student")
         return ADDSTUDENT
     elif text == 'حذف دانشجو':
         await update.message.reply_text("شماره دانشجویی شخص را جهت حذف از کلاس وارد کنید")
+        logger.info("admin select dell student")
         return DELETESTUDENT
     else:
         await update.message.reply_text("لطفا یکی از دستورات را وارد کنید.", reply_markup=admin_markup)
+        logger.info("admin write a wrong order")
         return CHOOSEACTION
 
 
@@ -91,11 +102,13 @@ async def admin_add_student(update, context):
     try:
         add_student_with_admin(int(text))
         await update.message.reply_text("دانشجو با موفقیت به لیست کلاس اضافه شد", reply_markup=admin_markup)
+        logger.info("student with student number %s added to the class", text)
         return CHOOSEACTION
     except:
         print(errorcode)
         await update.message.reply_text("امکان افزودن دانشجو با این شماره دانشجویی وجود ندارد",
                                         reply_markup=admin_markup)
+        logger.info("failed to add student with student number %s to the class", text)
         return CHOOSEACTION
 
 
@@ -107,10 +120,12 @@ async def admin_del_student(update, context):
     try:
         delete_student_with_admin(int(text))
         await update.message.reply_text("دانشجو با موفقیت از لیست کلاس حذف شد", reply_markup=admin_markup)
+        logger.info("student with student number %s deleted from class successfully", text)
         return CHOOSEACTION
     except:
         print(errorcode)
         await update.message.reply_text("امکان حذف دانشجو با این شماره دانشجویی وجود ندارد", reply_markup=admin_markup)
+        logger.info("failed to delete student with student number %s from the class", text)
         return CHOOSEACTION
 
 
@@ -134,8 +149,6 @@ async def student_info(update, context):
     user = update.message.from_user
     user_data = context.user_data
     text = update.message.text
-    message = ""
-    id, student_number, fname, lname, password, sex, login = range(7)
     try:
         info = get_student_info(int(text))
         id = info[0]
@@ -154,6 +167,7 @@ async def student_info(update, context):
                   f"وضعیت لاگین: {login}\n"
         await update.message.reply_text("اطلاعات دانشجو:")
         await update.message.reply_text(message, reply_markup=admin_markup)
+        logger.info("admin saw student with student number %s info", text)
         return CHOOSEACTION
     except:
         print(errorcode)
@@ -166,13 +180,16 @@ async def all_students_info(update, context):
     if len(students) != 0:
         text = "\n \n".join(students)
         await update.message.reply_text(text, reply_markup=admin_markup)
+        logger.info("admin saw students info")
     else:
         await update.message.reply_text("دانشجویی وجود ندارد", reply_markup=admin_markup)
+        logger.info("failed to show students info")
     return CHOOSEACTION
 
 
 async def create_card_cancel(update, context):
     await update.message.reply_text("ایجاد کارتها لغو شد!", reply_markup=admin_markup)
+    logger.info("create cards canceled")
     return CHOOSEACTION
 
 
@@ -202,9 +219,11 @@ async def add_cards_db(update, context):
         cursor.close()
         cnx.close()
         await update.message.reply_text("کارتها با موفقیت در دیتابیس ایجاد شدند.", reply_markup=admin_markup)
+        logger.info("cards added to database")
     except:
         print(errorcode)
         await update.message.reply_text("کارتها ایجاد نشدند.", reply_markup=admin_markup)
+        logger.info("failed to add cards to database")
     return CHOOSEACTION
 
 
@@ -228,6 +247,7 @@ async def broadcast_leader_cards(update, context):
         except:
             print("chat with id %d not fount" % chat_id)
     await update.message.reply_text("کارتهای سرگروه ها با موفقیت پخش شدند.", reply_markup=admin_markup)
+    logger.info("admin cards sent successfully")
     return CHOOSEACTION
 
 
@@ -253,6 +273,7 @@ async def broadcast_cards(update, context):
         except:
             print("chat with id %d not fount" % chat_id)
     await update.message.reply_text("کارتها ها با موفقیت پخش شدند.", reply_markup=admin_markup)
+    logger.info("student cards sent successfully")
     return CHOOSEACTION
 
 
@@ -412,6 +433,7 @@ async def get_sub_title(update, context):
     category = 'عنوان موضوع'
     text = update.message.text
     user_data[category] = text
+    logger.info("admin set %s for subject title", text)
     await update.message.reply_text("سرفصل را بنویسید:")
     await update.message.reply_text("در انتخاب سرفصل دقت کنید.موضوعات دارای سرفصل یکسان در یک گروه قرار میگیرند")
     return TOPIC
@@ -423,6 +445,7 @@ async def get_sub_topic(update, context):
     category = 'سرفصل موضوع'
     text = update.message.text
     user_data[category] = text
+    logger.info("admin set %s for subject topic", text)
     await update.message.reply_text("توضیحات مربوط ب این موضوع را بنویسید")
     return DESCRIPTION
 
@@ -433,6 +456,7 @@ async def get_sub_description(update, context):
     category = 'توضیحات موضوع'
     text = update.message.text
     user_data[category] = text
+    logger.info("admin set %s for subject description", text)
     await update.message.reply_text("شماره ی هفته ی مربوط به این موضوع را بنویسید")
     return WEEK
 
@@ -453,6 +477,7 @@ async def get_sub_week(update, context):
     category = 'شماره ی هفته'
     text = update.message.text
     user_data[category] = text
+    logger.info("admin set %s for subject week", text)
     await update.message.reply_text(
         'لطفا بررسی کنید که آیا اطلاعات مورد تاییدتان است یا نه {}'.format(
             admin_facts_to_str(user_data)), reply_markup=markup_sub_confirmation)
@@ -471,6 +496,7 @@ async def sub_confirmation(update, context):
 async def del_subject(update, context):
     text = update.message.text
     db_del_sub(text)
+    logger.info("admin delete subject with %s id", text)
     await update.message.reply_text("موضوع با موفقیت حذف شد", reply_markup=admin_markup)
     return CHOOSEACTION
 
@@ -480,6 +506,7 @@ async def show_subjects(update, context):
     if len(subjects) != 0:
         text = "\n \n".join(subjects)
         await update.message.reply_text(text, reply_markup=admin_markup)
+        logger.info("admin saw subjects", text)
     else:
         await update.message.reply_text("موضوعی وجود ندارد", reply_markup=admin_markup)
     return CHOOSEACTION
@@ -487,4 +514,5 @@ async def show_subjects(update, context):
 
 if __name__ == '__main__':
     # show_subjects()
-    pass
+    cards = [1, 2, 34]
+    print(cards)

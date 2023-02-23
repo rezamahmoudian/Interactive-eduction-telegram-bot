@@ -313,8 +313,8 @@ def create_cards():
     cnx.close()
 
     cards = []
-    print(man)
-    print(female)
+    print("man:" + str(man))
+    print("female:" + str(female))
     len_subjects = len(subjects)
     while len(man) != 0 and len(female) != 0:
         if len(subjects) != 0:
@@ -352,19 +352,16 @@ def create_cards():
                 break
             cards.append(card)
 
-    print(cards)
-    print(man)
-    print(female)
+    print("cards:" + str(cards))
 
     people = man + female
-    print("people:")
-    print(people)
+    print("people:" + str(people))
 
     while len(people) != 0:
         for i in range(len(cards)):
             cards[i].append(people[0])
             people.pop(0)
-            if len(people)==0:
+            if len(people) == 0:
                 break
 
     print(people)
@@ -379,7 +376,7 @@ def add_leader_cards_db(leader_cards):
         description = f"درباره ی موصوع {data[0]} اطلاعات کسب کنید و گروه خود را برای ارائه ی این موصوع مدیریت کنید."
         add_card = "INSERT INTO leader_cards (`student_id`,`topic`,`description`) VALUES" \
                    " ( {student_id} , '{topic}' , '{des}');".format(student_id=data[1], topic=str(data[0]),
-                                                                  des=description)
+                                                                    des=description)
         cursor.execute(add_card)
         cursor = cnx.cursor()
 
@@ -655,4 +652,3 @@ def db_get_students():
     cursor.close()
     cnx.close()
     return students
-
