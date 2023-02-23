@@ -13,8 +13,6 @@ PORT = int(os.environ.get('PORT', 5000))
 
 
 async def help(update, context):
-    user = update.message.from_user
-    user_data = context.user_data
     await update.message.reply_text("با استفاده از کلید menu میتوانید لیست دستورات را مشاهده کنید.\n"
                                     "با ارسال هریک از دستورات وارد یک مکالمه با ربات میشوید.\n"
                                     "**لطفا قبل از پایان هر مکالمه دستور دیگری وارد نکنید** \n"
@@ -32,7 +30,6 @@ def error(update, context):
 
 def main():
     app = ApplicationBuilder().token(TOKEN).build()
-
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start), CommandHandler('login', start)],
 
@@ -66,58 +63,54 @@ def main():
                          MessageHandler(filters.TEXT, admin_add_student),
                          ],
             DELETESTUDENT: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
-                         MessageHandler(filters.TEXT, admin_del_student),
-                         ],
+                            MessageHandler(filters.TEXT, admin_del_student),
+                            ],
             CHECKADMINPASS: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
-                             MessageHandler(filters.TEXT, check_admin_pass)],
-            # CHOOSEACTION: [CommandHandler('admin', admin),
-            #                MessageHandler(filters.Regex('^ایجاد کارتها$'), add_cards_db),
-            #                MessageHandler(filters.Regex('^پخش کارتها$'), broadcast_cards),
-            #                ]
+                             MessageHandler(filters.TEXT, check_admin_pass)
+                             ],
             CHOOSEACTION: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
                            MessageHandler(filters.TEXT, choose_action),
                            ],
             CREATECARDS: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
                           MessageHandler(filters.TEXT, add_cards_db),
-                          # MessageHandler(filters.Regex('^بله$'), add_cards_db),
-                          # MessageHandler(filters.Regex('^خیر'), create_card_cancel),
                           ],
             BROADCASTCARDS: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
                              MessageHandler(filters.Regex('^سرگروه ها$'), broadcast_leader_cards),
                              MessageHandler(filters.Regex('^زیرگروه ها'), broadcast_cards),
                              ],
             SHOWUSERINFORMATION: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
-                                  MessageHandler(filters.TEXT, admin_show_user_info)],
-
+                                  MessageHandler(filters.TEXT, admin_show_user_info)
+                                  ],
             STUDENTINFO: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
-                          MessageHandler(filters.TEXT, student_info)],
-
+                          MessageHandler(filters.TEXT, student_info)
+                          ],
             ALLSTUDENTSINFO: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
-                              MessageHandler(filters.TEXT, all_students_info)],
+                              MessageHandler(filters.TEXT, all_students_info)
+                              ],
             # add subject
             TITLE: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
-                     MessageHandler(filters.TEXT, get_sub_title)],
-
+                     MessageHandler(filters.TEXT, get_sub_title)
+                    ],
             TOPIC: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
-                    MessageHandler(filters.TEXT, get_sub_topic)],
-
+                    MessageHandler(filters.TEXT, get_sub_topic)
+                    ],
             DESCRIPTION: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
-                    MessageHandler(filters.TEXT, get_sub_description)],
-
+                    MessageHandler(filters.TEXT, get_sub_description)
+                          ],
             WEEK: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
-                    MessageHandler(filters.TEXT, get_sub_week)],
-
+                    MessageHandler(filters.TEXT, get_sub_week)
+                   ],
             SUBCONFIRMATION: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
                               MessageHandler(filters.Regex('^مورد تایید است$'), sub_confirmation),
-                              MessageHandler(filters.Regex('^شروع دوباره$'), choose_action)],
-
+                              MessageHandler(filters.Regex('^شروع دوباره$'), choose_action)
+                              ],
             SHOWSUBJECTS: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
                            MessageHandler(filters.Regex('^بله$'), show_subjects),
                            MessageHandler(filters.Regex('^خیر'), choose_action),
                            ],
-
             DELETESUB: [CommandHandler('admin', admin), CommandHandler('cancle', cancle),
-                        MessageHandler(filters.TEXT, del_subject)],
+                        MessageHandler(filters.TEXT, del_subject)
+                        ],
         },
         fallbacks=[CommandHandler('cancle', cancle)]
     )
