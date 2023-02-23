@@ -313,7 +313,8 @@ def create_cards():
     cnx.close()
 
     cards = []
-
+    print(man)
+    print(female)
     len_subjects = len(subjects)
     while len(man) != 0 and len(female) != 0:
         if len(subjects) != 0:
@@ -342,10 +343,12 @@ def create_cards():
             card.append(man[0])
             man.pop(0)
             if len(man) == 0:
+                cards.append(card)
                 break
             card.append(man[0])
             man.pop(0)
             if len(man) == 0:
+                cards.append(card)
                 break
             cards.append(card)
 
@@ -354,14 +357,14 @@ def create_cards():
     print(female)
 
     people = man + female
+    print("people:")
     print(people)
 
     while len(people) != 0:
         for i in range(len(cards)):
-            if len(people) != 0:
-                cards[i].append(people[0])
-                people.pop(0)
-            else:
+            cards[i].append(people[0])
+            people.pop(0)
+            if len(people)==0:
                 break
 
     print(people)
