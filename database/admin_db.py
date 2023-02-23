@@ -1,246 +1,10 @@
-import mysql.connector
-from mysql.connector import errorcode
-import random
-import os
-from dotenv import load_dotenv
+from .main_db import *
 
-
-def database_connector():
-    cnx = mysql.connector.connect(host=os.getenv('DB_HOST'), port=os.getenv('DB_PORT'), user=os.getenv('DATABASE_USER'),
-                                  password=os.getenv('DATABASE_PASS'),
-                                  database=os.getenv('DB_NAME'))
-    return cnx
-
-
-# USERS
-def create_database():
-    DB_NAME = os.getenv('DB_NAME')
-    TABLES = {}
-    TABLES['students'] = (
-        "CREATE TABLE `students` ("
-        "  `id` int(11) NOT NULL,"
-        "  `student_number` int(8) NOT NULL,"
-        "  `first_name` varchar(14) NOT NULL,"
-        "  `last_name` varchar(16) NOT NULL,"
-        "  `password` varchar(20) NOT NULL,"
-        "  `sex` enum('M','F') NOT NULL,"
-        "  `login` int(2) NOT NULL,"
-        "  PRIMARY KEY (`student_number`)"
-        ") ENGINE=InnoDB")
-
-    TABLES['subjects'] = (
-        "CREATE TABLE `subjects` ("
-        "  `id` int(11) NOT NULL AUTO_INCREMENT,"
-        "  `week` int(8) NOT NULL,"
-        "  `title` varchar(200) NOT NULL,"
-        "  `description` text ,"
-        "  `topic` varchar(20) NOT NULL,"
-        "  PRIMARY KEY (`id`)"
-        ") ENGINE=InnoDB")
-
-    TABLES['cards'] = (
-        "CREATE TABLE `cards` ("
-        "  `id` int(11) NOT NULL AUTO_INCREMENT,"
-        "  `student_id` int(8) NOT NULL,"
-        "  `subject_id` int(8) NOT NULL,"
-        "  PRIMARY KEY (`id`),"
-        "   FOREIGN KEY (student_id) REFERENCES students(student_number),"
-        "   FOREIGN KEY (subject_id) REFERENCES subjects(id)"
-        ") ENGINE=InnoDB")
-
-    TABLES['leader_cards'] = (
-        "CREATE TABLE `leader_cards` ("
-        "  `id` int(11) NOT NULL AUTO_INCREMENT,"
-        "  `student_id` int(8) NOT NULL,"
-        "  `topic` varchar(200) NOT NULL,"
-        "  `description` text ,"
-        "  PRIMARY KEY (`id`),"
-        "   FOREIGN KEY (student_id) REFERENCES students(student_number)"
-        ") ENGINE=InnoDB")
-
-    cnx = database_connector()
-    cursor = cnx.cursor()
-
-    try:
-        cursor.execute(
-            "CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(DB_NAME))
-    except mysql.connector.Error as err:
-        print("Failed creating database: {}".format(err))
-
-    try:
-        cursor.execute("USE {}".format(DB_NAME))
-    except mysql.connector.Error as err:
-        print("Database {} does not exists.".format(DB_NAME))
-        if err.errno == errorcode.ER_BAD_DB_ERROR:
-            create_database(cursor)
-            print("Database {} created successfully.".format(DB_NAME))
-            cnx.database = DB_NAME
-        else:
-            print(err)
-
-    for table_name in TABLES:
-        table_description = TABLES[table_name]
-        try:
-            print("Creating table {}: ".format(table_name), end='')
-            cursor.execute(table_description)
-        except mysql.connector.Error as err:
-            if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-                print("already exists.")
-            else:
-                print(err.msg)
-        else:
-            print("OK")
-
-    cursor.close()
-    cnx.close()
-
-
-def login(student_num):
-    cnx = database_connector()
-    cursor = cnx.cursor()
-
-    query = "UPDATE `students` SET login = 1 WHERE student_number = %d" % int(student_num)
-    cursor.execute(query)
-    cnx.commit()
-
-    cursor.close()
-    cnx.close()
-
-
-def logout_db(user_id):
-    cnx = database_connector()
-    cursor = cnx.cursor()
-
-    query = "UPDATE `students` SET login = 0 WHERE id = %d" % user_id
-
-    cursor.execute(query)
-    cnx.commit()
-    cursor.close()
-    cnx.close()
-
-
-def check_log(user_id):
-    cnx = database_connector()
-    cursor = cnx.cursor()
-
-    check = False
-    query = "SELECT login FROM students WHERE id = %d" % user_id
-    cursor.execute(query)
-    for data in cursor:
-        if data[0] == 1:
-            check = True
-        else:
-            check = False
-
-    cursor.close()
-    cnx.close()
-    return check
-
-
-def check_student_number(student_number):
-    cnx = database_connector()
-    cursor = cnx.cursor()
-
-    check = False
-    query = "SELECT student_number FROM students"
-    cursor.execute(query)
-    for data in cursor:
-        for student_num in data:
-            if student_num == student_number:
-                check = True
-
-    cursor.close()
-    cnx.close()
-    return check
-
-
-def check_student_data(student_num):
-    cnx = database_connector()
-    cursor = cnx.cursor()
-
-    check = False
-    query = ("SELECT id FROM students WHERE student_number = %d" % student_num)
-    cursor.execute(query)
-    for data in cursor:
-        for id in data:
-            if id != -1:
-                check = True
-
-    cursor.close()
-    cnx.close()
-    return check
-
-
-def check_password_from_db(student_num, password):
-    cnx = database_connector()
-    cursor = cnx.cursor()
-
-    check = False
-    query = ("SELECT password FROM students WHERE student_number = {}".format(student_num))
-    cursor.execute(query)
-    for data in cursor:
-        for p in data:
-            if p == password:
-                check = True
-
-    cursor.close()
-    cnx.close()
-    return check
-
-
-def check_telegram_id_exist(user_id):
-    cnx = database_connector()
-    cursor = cnx.cursor()
-
-    check = False
-    query = "SELECT id FROM students"
-    cursor.execute(query)
-    for data in cursor:
-        for id in data:
-            if id == user_id:
-                check = True
-
-    cursor.close()
-    cnx.close()
-    return check
-
-
-def add_student(user_id, user_data):
-    items = []
-    sex = ''
-    for key, value in user_data.items():
-        items.append(value)
-    if items[3] == 'مرد':
-        sex = 'M'
-    elif items[3] == 'زن':
-        sex = 'F'
-
-    # add user to the database
-    cnx = database_connector()
-    cursor = cnx.cursor()
-
-    update_student = ("UPDATE students"
-                      " SET id = %s, first_name = %s, last_name = %s, sex = %s, password = %s"
-                      "WHERE student_number = %s")
-    # add_student = ("INSERT INTO students "
-    #                "(id, student_number, first_name, last_name, sex)"
-    #                "VALUES (%s, %s, %s, %s, %s)")
-
-    data_student = (user_id, items[1], items[2], sex, items[4], items[0])
-    cursor.execute(update_student, data_student)
-    cnx.commit()
-
-    cursor.close()
-    cnx.close()
-
-
-# ADMINS
 
 def get_man_students():
     man = []
     cnx = database_connector()
     cursor = cnx.cursor()
-
     queryM = "SELECT * FROM students WHERE sex = 'M' and login = 1"
     cursor.execute(queryM)
     for data in cursor:
@@ -254,13 +18,10 @@ def get_female_students():
     female = []
     cnx = database_connector()
     cursor = cnx.cursor()
-
     queryF = "SELECT * FROM students WHERE sex = 'F' and login = 1"
-
     cursor.execute(queryF)
     for data in cursor:
         female.append(data[1])
-
     cursor.close()
     cnx.close()
     return female
@@ -269,13 +30,11 @@ def get_female_students():
 def create_leader_cards(man, female):
     cnx = database_connector()
     cursor = cnx.cursor()
-
     topics = []
     query_cards = "SELECT * FROM subjects;"
     cursor.execute(query_cards)
     for data in cursor:
         topics.append(data[4])
-
     topics = list(dict.fromkeys(topics))
     cursor.close()
     leader_cards = []
@@ -293,25 +52,19 @@ def create_leader_cards(man, female):
 def create_cards(week):
     cnx = database_connector()
     cursor = cnx.cursor()
-
     man = get_man_students()
     female = get_female_students()
-
     random.shuffle(man)
     random.shuffle(female)
-
     leader_cards = create_leader_cards(man, female)
     add_leader_cards_db(leader_cards)
-
     subjects = []
     query_cards = ("SELECT * FROM subjects WHERE week=%d;" % week)
     cursor.execute(query_cards)
     for data in cursor:
         subjects.append(data[0])
-
     cursor.close()
     cnx.close()
-
     cards = []
     print("man:" + str(man))
     print("female:" + str(female))
@@ -333,7 +86,6 @@ def create_cards(week):
                 break
         else:
             break
-
     len_subjects = len(subjects)
     if len(subjects) != 0:
         for i in range(len_subjects):
@@ -351,19 +103,15 @@ def create_cards(week):
                 cards.append(card)
                 break
             cards.append(card)
-
     print("cards:" + str(cards))
-
     people = man + female
     print("people:" + str(people))
-
     while len(people) != 0:
         for i in range(len(cards)):
             cards[i].append(people[0])
             people.pop(0)
             if len(people) == 0:
                 break
-
     print(people)
     print(cards)
     return cards
@@ -379,9 +127,7 @@ def add_leader_cards_db(leader_cards):
                                                                     des=description)
         cursor.execute(add_card)
         cursor = cnx.cursor()
-
     cnx.commit()
-
     cursor.close()
     cnx.close()
 
@@ -389,8 +135,6 @@ def add_leader_cards_db(leader_cards):
 def get_leader_nums():
     cnx = database_connector()
     cursor = cnx.cursor()
-    # get_leader_topic(9901123)
-    # get_leader_description(9901119)
     query = "SELECT student_id FROM leader_cards;"
     cursor.execute(query)
     leader_nums = []
@@ -512,7 +256,6 @@ def get_subject_id(student_num):
 def get_subject_title(subject_id):
     cnx = database_connector()
     cursor = cnx.cursor()
-
     subject_title = ''
     query = "SELECT title FROM subjects WHERE id=%d;" % subject_id
     cursor.execute(query)
@@ -526,7 +269,6 @@ def get_subject_title(subject_id):
 def get_subject_description(subject_id):
     cnx = database_connector()
     cursor = cnx.cursor()
-
     subject_description = ''
     query = "SELECT description FROM subjects WHERE id=%d;" % subject_id
     cursor.execute(query)
@@ -540,7 +282,6 @@ def get_subject_description(subject_id):
 def get_subject_topic(subject_id):
     cnx = database_connector()
     cursor = cnx.cursor()
-
     subject_topic = ''
     query = "SELECT topic FROM subjects WHERE id=%d;" % subject_id
     cursor.execute(query)
@@ -591,12 +332,9 @@ def get_student_info(student_num):
 
 def add_subject(user_data):
     items = []
-    print(user_data.items())
     for key, value in user_data.items():
         if key in ('عنوان موضوع', 'سرفصل موضوع', 'توضیحات موضوع', 'شماره ی هفته'):
             items.append(value)
-            print(items)
-
     print(items)
     # add user to the database
     cnx = database_connector()
@@ -613,7 +351,6 @@ def add_subject(user_data):
     print(update_student)
     cursor.execute(update_student)
     cnx.commit()
-
     cursor.close()
     cnx.close()
 

@@ -1,7 +1,7 @@
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
+from telegram import ReplyKeyboardMarkup
 from main import bot, ConversationHandler
-from database_modules import *
 import logging
+from database.admin_db import *
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -31,24 +31,17 @@ markup_sub_confirmation = ReplyKeyboardMarkup(reply_keyboard_sub_confirm, resize
 CHECKADMINPASS, CHOOSEACTION, ADDSUB, DELETESUB, SHOWSUBJECTS, DELETEALLSUBJECTS, CREATECARDS, BROADCASTCARDS, RETURNCARDS, \
 SHOWUSERINFORMATION, ADDSTUDENT, DELETESTUDENT, STUDENTINFO,ALLSTUDENTSINFO, TITLE, DESCRIPTION, TOPIC, WEEK, SUBCONFIRMATION = range(19)
 
+admin_pass = os.getenv('ADMIN_PASS')
+
 
 async def admin(update, context):
-    user = update.message.from_user
-    user_data = context.user_data
     text = update.message.text
     print(text)
-
     await update.message.reply_text("رمز ورود به عنوان ادمین را وارد کنید:")
     return CHECKADMINPASS
 
 
-admin_pass = os.getenv('ADMIN_PASS')
-
-
 async def choose_action(update, context):
-    user = update.message.from_user
-    user_data = context.user_data
-
     text = update.message.text
     if text == 'افزودن موضوع':
         await update.message.reply_text("عنوان موضوع را وارد کنید")
@@ -94,11 +87,9 @@ async def choose_action(update, context):
         return CHOOSEACTION
 
 
+# user related activities
 async def admin_add_student(update, context):
-    user = update.message.from_user
-    user_data = context.user_data
     text = update.message.text
-
     try:
         add_student_with_admin(int(text))
         await update.message.reply_text("دانشجو با موفقیت به لیست کلاس اضافه شد", reply_markup=admin_markup)
@@ -113,10 +104,7 @@ async def admin_add_student(update, context):
 
 
 async def admin_del_student(update, context):
-    user = update.message.from_user
-    user_data = context.user_data
     text = update.message.text
-
     try:
         delete_student_with_admin(int(text))
         await update.message.reply_text("دانشجو با موفقیت از لیست کلاس حذف شد", reply_markup=admin_markup)
@@ -130,10 +118,7 @@ async def admin_del_student(update, context):
 
 
 async def admin_show_user_info(update, context):
-    user = update.message.from_user
-    user_data = context.user_data
     text = update.message.text
-
     if text == 'مشاهده ی اطلاعات یک دانشجو':
         await update.message.reply_text("شماره دانشجویی کاربر را وارد کنید")
         return STUDENTINFO
@@ -146,8 +131,6 @@ async def admin_show_user_info(update, context):
 
 
 async def student_info(update, context):
-    user = update.message.from_user
-    user_data = context.user_data
     text = update.message.text
     try:
         info = get_student_info(int(text))
@@ -187,6 +170,7 @@ async def all_students_info(update, context):
     return CHOOSEACTION
 
 
+# Cards related activities
 async def create_card_cancel(update, context):
     await update.message.reply_text("ایجاد کارتها لغو شد!", reply_markup=admin_markup)
     logger.info("create cards canceled")
@@ -206,25 +190,24 @@ async def add_cards_db(update, context):
     cnx.commit()
     cursor.close()
     cnx.close()
-
-    cards = create_cards(int(text))
-    cnx = database_connector()
-    cursor = cnx.cursor()
-    for data in cards:
-        for i in range(len(data) - 1):
-            add_card = "INSERT INTO `cards`(`student_id`,`subject_id`) VALUES " \
-                       "({student_id},{subject_id})".format(student_id=data[i + 1], subject_id=data[0])
-            cursor.execute(add_card)
-            cursor = cnx.cursor()
-    cnx.commit()
-    cursor.close()
-    cnx.close()
-    await update.message.reply_text("کارتها با موفقیت در دیتابیس ایجاد شدند.", reply_markup=admin_markup)
-    logger.info("cards added to database")
-    # except:
-    #     print(errorcode)
-    #     await update.message.reply_text("کارتها ایجاد نشدند.", reply_markup=admin_markup)
-    #     logger.info("failed to add cards to database")
+    try:
+        cards = create_cards(int(text))
+        cnx = database_connector()
+        cursor = cnx.cursor()
+        for data in cards:
+            for i in range(len(data) - 1):
+                add_card = "INSERT INTO `cards`(`student_id`,`subject_id`) VALUES " \
+                           "({student_id},{subject_id})".format(student_id=data[i + 1], subject_id=data[0])
+                cursor.execute(add_card)
+                cursor = cnx.cursor()
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        await update.message.reply_text("کارتها با موفقیت در دیتابیس ایجاد شدند.", reply_markup=admin_markup)
+        logger.info("cards added to database")
+    except:
+        await update.message.reply_text("کارتها ایجاد نشدند.", reply_markup=admin_markup)
+        logger.info("failed to add cards to database")
     return CHOOSEACTION
 
 
@@ -267,9 +250,8 @@ async def broadcast_cards(update, context):
                " \nموضوع شما در جلسه ی آینده {title} میباشد." \
                "\n توضیحات: {descrip}".format(fname=first_name, lname=last_name, student_num=student_number, title=title,
                                              descrip=description)
-        print(text)
         try:
-            logger.info("card sent for %s", first_name)
+            logger.info("card sent for %s with text:\n %s", first_name, text)
             await bot.send_message(chat_id=chat_id, text=text)
         except:
             print("chat with id %d not fount" % chat_id)
@@ -281,7 +263,6 @@ async def broadcast_cards(update, context):
 async def check_admin_pass(update, context):
     user = update.message.from_user
     user_data = context.user_data
-
     text = update.message.text
     check = text == admin_pass
     global student_numb
@@ -300,8 +281,6 @@ async def check_admin_pass(update, context):
         logger.info("%s Entered the admin panel", fname)
         return CHOOSEACTION
     else:
-        # await update.message.reply_text("رمز ورود صحیح نیست لطفا دوباره سعی کنید:")
-        # return CHECKADMINPASS
         try:
             user_data['enter_wrong_pass'] += 1
         except:
@@ -401,22 +380,19 @@ async def check_admin_pass(update, context):
         elif wrong_pass == 31:
             logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("دارم هکت میکنم مزاحمم نشو")
-
         elif wrong_pass == 32:
             logger.info("%s send %s for admin pass", fname, text)
-            try:
-                student_numb = get_student_number(user.id)
+            if student_numb != -1:
                 await update.message.reply_text("هک کامل شد!")
-                fname = get_student_fname(student_numb)
-                lname = get_student_lname(student_numb)
-
                 await update.message.reply_text("اسمت %sست" % fname)
                 await update.message.reply_text("فامیلیتم %sه" % lname)
                 await update.message.reply_text("آدرس خونتونم پیدا کردم.دارم میام سراغت")
-            except:
+                await update.message.reply_text("هک نشدی😕")
+                logger.info("user %s hacked", fname, text)
+            else:
                 print('شماره دانشجویی ثبت نیست')
                 await update.message.reply_text("هک نشدی😕")
-
+                logger.info("user %s hacked", fname, text)
         elif wrong_pass == 33:
             logger.info("%s send %s for admin pass", fname, text)
             await update.message.reply_text("من دیگه واقعا رفتم!خداحافظ")
@@ -429,7 +405,6 @@ async def check_admin_pass(update, context):
 
 
 async def get_sub_title(update, context):
-    user = update.message.from_user
     user_data = context.user_data
     category = 'عنوان موضوع'
     text = update.message.text
@@ -441,7 +416,6 @@ async def get_sub_title(update, context):
 
 
 async def get_sub_topic(update, context):
-    user = update.message.from_user
     user_data = context.user_data
     category = 'سرفصل موضوع'
     text = update.message.text
@@ -452,7 +426,6 @@ async def get_sub_topic(update, context):
 
 
 async def get_sub_description(update, context):
-    user = update.message.from_user
     user_data = context.user_data
     category = 'توضیحات موضوع'
     text = update.message.text
@@ -464,11 +437,9 @@ async def get_sub_description(update, context):
 
 def admin_facts_to_str(user_data):
     facts = list()
-
     for key, value in user_data.items():
         if key in ('عنوان موضوع', 'سرفصل موضوع', 'توضیحات موضوع', 'شماره ی هفته'):
             facts.append('{} - {}'.format(key, value))
-
     return "\n".join(facts).join(['\n', '\n'])
 
 
@@ -486,9 +457,7 @@ async def get_sub_week(update, context):
 
 
 async def sub_confirmation(update, context):
-    user = update.message.from_user
     user_data = context.user_data
-
     add_subject(user_data)
     await update.message.reply_text("موضوع به لیست موضوعات اضافه شد", reply_markup=admin_markup)
     return CHOOSEACTION
@@ -511,9 +480,3 @@ async def show_subjects(update, context):
     else:
         await update.message.reply_text("موضوعی وجود ندارد", reply_markup=admin_markup)
     return CHOOSEACTION
-
-
-if __name__ == '__main__':
-    # show_subjects()
-    cards = [1, 2, 34]
-    print(cards)

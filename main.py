@@ -1,6 +1,5 @@
 from __future__ import print_function
 from telegram.ext import (CommandHandler, MessageHandler, filters, ApplicationBuilder,CallbackQueryHandler)
-import os
 from users import *
 from admin import *
 from dotenv import load_dotenv
