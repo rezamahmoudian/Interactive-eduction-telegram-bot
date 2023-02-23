@@ -66,7 +66,7 @@ async def choose_action(update, context):
         logger.info("admin select delete all subjects")
         return DELETEALLSUBJECTS
     elif text == 'ایجاد کارتها':
-        await update.message.reply_text("آیا از انجام این فرایند مطمئن هستید؟", reply_markup=confirm_markup)
+        await update.message.reply_text("شماره ی هفته را وارد کنید.")
         logger.info("admin select create cards")
         return CREATECARDS
     elif text == 'پخش کارتها':
@@ -194,6 +194,7 @@ async def create_card_cancel(update, context):
 
 
 async def add_cards_db(update, context):
+    text = update.message.text
     cnx = database_connector()
     cursor = cnx.cursor()
     delete_leader_cards = "DELETE FROM leader_cards WHERE id != 0;"
@@ -205,25 +206,25 @@ async def add_cards_db(update, context):
     cnx.commit()
     cursor.close()
     cnx.close()
-    try:
-        cards = create_cards()
-        cnx = database_connector()
-        cursor = cnx.cursor()
-        for data in cards:
-            for i in range(len(data) - 1):
-                add_card = "INSERT INTO `cards`(`student_id`,`subject_id`) VALUES " \
-                           "({student_id},{subject_id})".format(student_id=data[i + 1], subject_id=data[0])
-                cursor.execute(add_card)
-                cursor = cnx.cursor()
-        cnx.commit()
-        cursor.close()
-        cnx.close()
-        await update.message.reply_text("کارتها با موفقیت در دیتابیس ایجاد شدند.", reply_markup=admin_markup)
-        logger.info("cards added to database")
-    except:
-        print(errorcode)
-        await update.message.reply_text("کارتها ایجاد نشدند.", reply_markup=admin_markup)
-        logger.info("failed to add cards to database")
+
+    cards = create_cards(int(text))
+    cnx = database_connector()
+    cursor = cnx.cursor()
+    for data in cards:
+        for i in range(len(data) - 1):
+            add_card = "INSERT INTO `cards`(`student_id`,`subject_id`) VALUES " \
+                       "({student_id},{subject_id})".format(student_id=data[i + 1], subject_id=data[0])
+            cursor.execute(add_card)
+            cursor = cnx.cursor()
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+    await update.message.reply_text("کارتها با موفقیت در دیتابیس ایجاد شدند.", reply_markup=admin_markup)
+    logger.info("cards added to database")
+    # except:
+    #     print(errorcode)
+    #     await update.message.reply_text("کارتها ایجاد نشدند.", reply_markup=admin_markup)
+    #     logger.info("failed to add cards to database")
     return CHOOSEACTION
 
 

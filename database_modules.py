@@ -290,7 +290,7 @@ def create_leader_cards(man, female):
     return leader_cards
 
 
-def create_cards():
+def create_cards(week):
     cnx = database_connector()
     cursor = cnx.cursor()
 
@@ -304,7 +304,7 @@ def create_cards():
     add_leader_cards_db(leader_cards)
 
     subjects = []
-    query_cards = "SELECT * FROM subjects;"
+    query_cards = ("SELECT * FROM subjects WHERE week=%d;" % week)
     cursor.execute(query_cards)
     for data in cursor:
         subjects.append(data[0])
