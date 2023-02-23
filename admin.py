@@ -1,6 +1,10 @@
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from main import bot, ConversationHandler
 from database_modules import *
+import logging
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 reply_keyboard = [
     ['موضوعات', 'دانشجویان'],
@@ -215,7 +219,7 @@ async def broadcast_leader_cards(update, context):
 
         text = " \n سلام {fname} {lname} عزیز با شماره دانشجویی {student_num}" \
                "\n شما در جلسه ی آینده به عنوان سرگروه انتخاب شده اید" \
-               " \n.میباشد {top} موضوع گروه شما در جلسه ی آینده " \
+               " \nموضوع گروه شما در جلسه ی آینده {top} میباشد " \
                "\n{descrip} :توضیحات".format(fname=first_name, lname=last_name, student_num=student_number, top=topic,
                                              descrip=description)
         print(text)
@@ -239,11 +243,12 @@ async def broadcast_cards(update, context):
         title = get_subject_title(subject_id)
 
         text = " \n سلام {fname} {lname} عزیز با شماره دانشجویی {student_num}" \
-               " \n.میباشد {title} موضوع شما در جلسه ی آینده " \
-               "\n{descrip} :توضیحات".format(fname=first_name, lname=last_name, student_num=student_number, title=title,
+               " \nموضوع شما در جلسه ی آینده {title} میباشد." \
+               "\n توضیحات: {descrip}".format(fname=first_name, lname=last_name, student_num=student_number, title=title,
                                              descrip=description)
         print(text)
         try:
+            logger.info("card sent for %s", first_name)
             await bot.send_message(chat_id=chat_id, text=text)
         except:
             print("chat with id %d not fount" % chat_id)
