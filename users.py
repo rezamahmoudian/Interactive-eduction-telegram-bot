@@ -123,15 +123,16 @@ async def check_password(update, context):
     check = check_password_from_db(int(student_num), text)
     logger.info("password of %s: %s checked", user.first_name, update.message.text)
     if check:
-        # try:
-        fname = get_student_fname(int(student_num))
-        lname = get_student_lname(int(student_num))
-        login(student_num)
-        await update.message.reply_text(f"{fname} {lname} شما با موفقیت وارد شدید")
-        # except:
-        #     login(student_num)
-        #     await update.message.reply_text("با موفقیت وارد شدید.")
-        #     return ConversationHandler.END
+         try:
+            fname = get_student_fname(int(student_num))
+            lname = get_student_lname(int(student_num))
+            login(student_num)
+            await update.message.reply_text(f"{fname} {lname} شما با موفقیت وارد شدید")
+            return ConversationHandler.END
+         except:
+            login(student_num)
+            await update.message.reply_text("با موفقیت وارد شدید.")
+            return ConversationHandler.END
     else:
         await update.message.reply_text("رمز ورود صحیح نیست. لطفا دوباره سعی کنید.")
         await update.message.reply_text("اگر رمز ورود خود را فراموش کرده اید این موضوع را با ta درس درمیان بگذارید. "
