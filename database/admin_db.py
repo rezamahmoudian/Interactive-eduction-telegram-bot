@@ -87,7 +87,7 @@ def create_cards(week):
         else:
             break
     len_subjects = len(subjects)
-    if len(subjects) != 0:
+    if len(subjects) != 0 and len(man) > len(female):
         for i in range(len_subjects):
             card = []
             card.append(subjects[0])
