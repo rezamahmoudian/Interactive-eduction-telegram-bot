@@ -22,6 +22,7 @@ async def help(update, context):
                                     "با دستور /login شما میتوانید وارد حساب کاربری خود شوید.\n"
                                     "با دستور /logout از حساب کاربری خود خارج میشوید.\n"
                                     "دستور /admin برای ورود ب ربات به عنوان مدیر است.\n")
+    return ConversationHandler.END
 
 
 def error(update, context):
@@ -35,21 +36,27 @@ def main():
 
         states={
             STUDENT_NUMBER: [CommandHandler('start', start), CommandHandler('login', start),
-                             CommandHandler('cancel', cancel),
+                             CommandHandler('cancel', cancel), CommandHandler('help', help),
                              MessageHandler(filters.TEXT, student_number)],
-            FNAME: [CommandHandler('start', start), CommandHandler('login', start), CommandHandler('cancel', cancel),
+            FNAME: [CommandHandler('start', start), CommandHandler('login', start),
+                    CommandHandler('cancel', cancel), CommandHandler('help', help),
                     MessageHandler(filters.TEXT, fname)],
+
             LNAME: [CommandHandler('start', start), CommandHandler('login', start), CommandHandler('cancel', cancel),
-                    MessageHandler(filters.TEXT, lname)],
+                    CommandHandler('help', help), MessageHandler(filters.TEXT, lname)],
+
             SEX: [CommandHandler('start', start), CommandHandler('login', start), CommandHandler('cancel', cancel),
-                  MessageHandler(filters.TEXT, sex)],
+                  CommandHandler('help', help), MessageHandler(filters.TEXT, sex)],
+
             PASSWORD: [CommandHandler('start', start), CommandHandler('login', start), CommandHandler('cancel', cancel),
-                       MessageHandler(filters.TEXT, password)],
+                       CommandHandler('help', help), MessageHandler(filters.TEXT, password)],
+
             CHECKPASSWORD: [CommandHandler('start', start), CommandHandler('login', start),
-                            CommandHandler('cancel', cancel),
+                            CommandHandler('cancel', cancel), CommandHandler('help', help),
                             MessageHandler(filters.TEXT, check_password)],
+
             CONFIRMATION: [CommandHandler('start', start), CommandHandler('login', start),
-                           CommandHandler('cancel', cancel),
+                           CommandHandler('cancel', cancel), CommandHandler('help', help),
                            MessageHandler(filters.Regex('^مورد تایید است$'), confirmation),
                            MessageHandler(filters.Regex('^شروع دوباره$'), start)],
         },
