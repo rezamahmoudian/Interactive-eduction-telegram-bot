@@ -29,7 +29,8 @@ student_info_markup = ReplyKeyboardMarkup(reply_keyboard_student_info, resize_ke
 markup_sub_confirmation = ReplyKeyboardMarkup(reply_keyboard_sub_confirm, resize_keyboard=True, one_time_keyboard=True)
 
 CHECKADMINPASS, CHOOSEACTION, ADDSUB, DELETESUB, SHOWSUBJECTS, DELETEALLSUBJECTS, CREATECARDS, BROADCASTCARDS, RETURNCARDS, \
-SHOWUSERINFORMATION, ADDSTUDENT, DELETESTUDENT, STUDENTINFO,ALLSTUDENTSINFO, TITLE, DESCRIPTION, TOPIC, WEEK, SUBCONFIRMATION = range(19)
+SHOWUSERINFORMATION, ADDSTUDENT, DELETESTUDENT, STUDENTINFO, ALLSTUDENTSINFO, TITLE, DESCRIPTION, TOPIC, WEEK, SUBCONFIRMATION = range(
+    19)
 
 admin_pass = os.getenv('ADMIN_PASS')
 
@@ -70,7 +71,8 @@ async def choose_action(update, context):
         logger.info("admin select return cards")
         return RETURNCARDS
     elif text == 'مشاهده ی اطلاعات دانشجویان':
-        await update.message.reply_text(text="لطفا فرایندی را که قصد انجام آن را دارید انتخاب کنید", reply_markup=student_info_markup)
+        await update.message.reply_text(text="لطفا فرایندی را که قصد انجام آن را دارید انتخاب کنید",
+                                        reply_markup=student_info_markup)
         logger.info("admin select show students information")
         return SHOWUSERINFORMATION
     elif text == 'افزودن دانشجو':
@@ -154,7 +156,8 @@ async def student_info(update, context):
         return CHOOSEACTION
     except:
         print(errorcode)
-        await update.message.reply_text("امکان دریافت اطلاعات دانشجو با این شماره دانشجویی وجود ندارد", reply_markup=admin_markup)
+        await update.message.reply_text("امکان دریافت اطلاعات دانشجو با این شماره دانشجویی وجود ندارد",
+                                        reply_markup=admin_markup)
         return CHOOSEACTION
 
 
@@ -223,8 +226,8 @@ async def broadcast_leader_cards(update, context):
         text = " \n سلام {fname} {lname} عزیز با شماره دانشجویی {student_num}" \
                "\n شما در جلسه ی آینده به عنوان سرگروه انتخاب شده اید" \
                " \nموضوع گروه شما در جلسه ی آینده {top} میباشد " \
-               "\n{descrip} :توضیحات".format(fname=first_name, lname=last_name, student_num=student_number, top=topic,
-                                             descrip=description)
+               "\nتوضیحات: {des}".format(fname=first_name, lname=last_name, student_num=student_number, top=topic,
+                                       des=description)
         print(text)
         try:
             await bot.send_message(chat_id=chat_id, text=text)
@@ -248,8 +251,9 @@ async def broadcast_cards(update, context):
 
         text = " \n سلام {fname} {lname} عزیز با شماره دانشجویی {student_num}" \
                " \nموضوع شما در جلسه ی آینده {title} میباشد." \
-               "\n توضیحات: {descrip}".format(fname=first_name, lname=last_name, student_num=student_number, title=title,
-                                             descrip=description)
+               "\n توضیحات: {descrip}".format(fname=first_name, lname=last_name, student_num=student_number,
+                                              title=title,
+                                              descrip=description)
         try:
             logger.info("card sent for %s with text:\n %s", first_name, text)
             await bot.send_message(chat_id=chat_id, text=text)

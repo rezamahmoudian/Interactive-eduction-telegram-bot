@@ -121,7 +121,7 @@ def add_leader_cards_db(leader_cards):
     cnx = database_connector()
     cursor = cnx.cursor()
     for data in leader_cards:
-        description = f"درباره ی موصوع {data[0]} اطلاعات کسب کنید و گروه خود را برای ارائه ی این موصوع مدیریت کنید."
+        description = f"درباره ی موضوع {data[0]} اطلاعات کسب کنید و گروه خود را برای ارائه ی این موضوع مدیریت کنید."
         add_card = "INSERT INTO leader_cards (`student_id`,`topic`,`description`) VALUES" \
                    " ( {student_id} , '{topic}' , '{des}');".format(student_id=data[1], topic=str(data[0]),
                                                                     des=description)
