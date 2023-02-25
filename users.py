@@ -8,7 +8,7 @@ from database.admin_db import get_student_fname, get_student_lname
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-STUDENT_NUMBER, FNAME, LNAME, SEX, PASSWORD, CHECKPASSWORD, CONFIRMATION, CANCLE = range(8)
+STUDENT_NUMBER, FNAME, LNAME, SEX, PASSWORD, CHECKPASSWORD, CONFIRMATION, CANCEl = range(8)
 
 reply_keyboard = [['شروع دوباره', 'مورد تایید است']]
 reply_keyboard_sex = [['زن', 'مرد']]
@@ -23,7 +23,8 @@ async def start(update, context):
     user = update.message.from_user
     text = update.message.text
     if check_telegram_id_exist(user.id) and check_log(user.id):
-        await update.message.reply_text("با موفقیت وارد شدید!")
+        await update.message.reply_text("شما قبلا وارد حساب کاربری خود شده اید \n"
+                                        "اگر میخواهید از حساب خود خارج شوید دستور /logout را وارد کنید")
         return ConversationHandler.END
     elif check_telegram_id_exist(user.id) or text == "/login":
         await update.message.reply_text("برای ورود شماره دانشجویی خود را وارد کنید!")
@@ -60,7 +61,7 @@ async def student_number(update, context):
             return STUDENT_NUMBER
     except:
         await update.message.reply_text("لطفا شماره دانشجویی خود را بطور صحیح وارد کنید")
-        await update.message.reply_text("برای خروج دستور /cancle را وارد کنید")
+        await update.message.reply_text("برای خروج دستور /cancel را وارد کنید")
         return STUDENT_NUMBER
 
 
@@ -134,7 +135,8 @@ async def check_password(update, context):
     else:
         await update.message.reply_text("رمز ورود صحیح نیست. لطفا دوباره سعی کنید.")
         await update.message.reply_text("اگر رمز ورود خود را فراموش کرده اید این موضوع را با ta درس درمیان بگذارید. "
-                                        "در غیر این صورت رمز عبور صحیح را وارد کنید:")
+                                        "در غیر این صورت رمز عبور صحیح را وارد کنید\n"
+                                        "برای خروج از دستور /cancel استفاده کنید")
         return CHECKPASSWORD
 
 
@@ -148,7 +150,7 @@ async def confirmation(update, context):
     return STUDENT_NUMBER
 
 
-async def cancle(update, context):
+async def cancel(update, context):
     user = update.message.from_user
     logger.info("User %s canceled the coneversation", user.first_name)
     await update.message.reply_text("با موفقیت خارج شدید", reply_markup=ReplyKeyboardRemove())
