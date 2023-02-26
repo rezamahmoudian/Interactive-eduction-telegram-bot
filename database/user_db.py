@@ -113,7 +113,7 @@ def add_student(user_id, user_data):
     update_student = ("UPDATE students"
                       " SET id = %s, first_name = %s, last_name = %s, sex = %s, password = %s"
                       "WHERE student_number = %s")
-    data_student = (user_id, items[1], items[2], sex, items[4], items[0])
+    data_student = (user_id, items[1], items[2], sex, items[4], str(int(items[0])))
     cursor.execute(update_student, data_student)
     cnx.commit()
     cursor.close()

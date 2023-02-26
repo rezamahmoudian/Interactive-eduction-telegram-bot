@@ -1,5 +1,5 @@
 from __future__ import print_function
-from telegram.ext import (CommandHandler, MessageHandler, filters, ApplicationBuilder,CallbackQueryHandler)
+from telegram.ext import (CommandHandler, MessageHandler, filters, ApplicationBuilder, CallbackQueryHandler)
 from users import *
 from admin import *
 from dotenv import load_dotenv
@@ -15,7 +15,7 @@ PORT = int(os.environ.get('PORT', 5000))
 async def help(update, context):
     await update.message.reply_text("با استفاده از کلید menu میتوانید لیست دستورات را مشاهده کنید.\n"
                                     "با ارسال هریک از دستورات وارد یک مکالمه با ربات میشوید.\n"
-                                    "**لطفا قبل از پایان هر مکالمه دستور دیگری وارد نکنید** \n"
+                                    "**لطفا قبل از پایان هر مکالمه دستور دیگری وارد نکنید**\n"
                                     "شما میتوانید در هر لحظه با استفاده از دستور /cancel مکالمه ی خود با ربات را به "
                                     "پایان برسانید. \n "
                                     "با دستور /start ربات آغاز ب کار میکند\n"
