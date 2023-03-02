@@ -278,7 +278,7 @@ async def check_admin_pass(update, context):
         lname = get_student_lname(student_numb)
     except:
         student_numb = -1
-        fname = "unknown"
+        fname = user.first_name
         lname = "unknown"
     if check:
         await update.message.reply_text("با موفقیت وارد شدید.", reply_markup=admin_markup)
@@ -480,7 +480,14 @@ async def show_subjects(update, context):
     if len(subjects) != 0:
         text = "\n \n".join(subjects)
         await update.message.reply_text(text, reply_markup=admin_markup)
-        logger.info("admin saw subjects", text)
+        logger.info("admin saw subjects")
     else:
         await update.message.reply_text("موضوعی وجود ندارد", reply_markup=admin_markup)
     return CHOOSEACTION
+
+# if __name__=='__main__':
+#     text = input()
+#     check = "123"
+#     print(text)
+#     if text == check:
+#         print("hacked")

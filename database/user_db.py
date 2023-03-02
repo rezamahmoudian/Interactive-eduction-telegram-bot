@@ -72,6 +72,8 @@ def check_password_from_db(student_num, password):
     cursor = cnx.cursor()
     check = False
     query = ("SELECT password FROM students WHERE student_number = {}".format(student_num))
+    print(query)
+    print(password)
     cursor.execute(query)
     for data in cursor:
         for p in data:

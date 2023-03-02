@@ -46,6 +46,7 @@ def create_leader_cards(man, female):
             man.pop(0)
             leader_cards.append(card)
     cnx.close()
+    print("leader_cards: "+str(leader_cards))
     return leader_cards
 
 
