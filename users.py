@@ -56,7 +56,7 @@ async def student_number(update, context):
                 return FNAME
         else:
             await update.message.reply_text("شماره دانشجویی شما در کلاس ثبت نیست.")
-            await update.message.reply_text("اگر از دانشجویان کلاس هستید این موصوع را با ta در میان بگذارید.")
+            await update.message.reply_text("اگر از دانشجویان کلاس هستید این موضوع را با ta در میان بگذارید.")
             await update.message.reply_text("و یا شماره دانشجویی صحیح را وارد کنید:")
             return STUDENT_NUMBER
     except:
