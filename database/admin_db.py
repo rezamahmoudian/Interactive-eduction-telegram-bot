@@ -27,11 +27,11 @@ def get_female_students():
     return female
 
 
-def create_leader_cards(man, female):
+def create_leader_cards(man, female, week):
     cnx = database_connector()
     cursor = cnx.cursor()
     topics = []
-    query_cards = "SELECT * FROM subjects;"
+    query_cards = ("SELECT * FROM subjects WHERE week=%d;" % week)
     cursor.execute(query_cards)
     for data in cursor:
         topics.append(data[4])
@@ -57,8 +57,8 @@ def create_cards(week):
     female = get_female_students()
     random.shuffle(man)
     random.shuffle(female)
-    leader_cards = create_leader_cards(man, female)
-    add_leader_cards_db(leader_cards)
+    # leader_cards = create_leader_cards(man, female, week)
+    # add_leader_cards_db(leader_cards)
     subjects = []
     query_cards = ("SELECT * FROM subjects WHERE week=%d;" % week)
     cursor.execute(query_cards)

